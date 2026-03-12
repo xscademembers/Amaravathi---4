@@ -1,0 +1,5 @@
+{
+  "name": "Amaravathi Conventions",
+  "description": "Vijayawada’s premier luxury venue for weddings, corporate events, and grand celebrations.",
+  "requestFramePermissions": ["geolocation"]
+}

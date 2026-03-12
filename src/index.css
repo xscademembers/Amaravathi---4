@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+  
+  --color-maroon: #800000;
+  --color-gold: #D4AF37;
+  --color-ivory: #FFFFF0;
+  --color-charcoal: #333333;
+}
+
+@layer base {
+  body {
+    @apply bg-ivory text-charcoal font-sans;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+.luxury-shadow {
+  box-shadow: 0 10px 30px -10px rgba(128, 0, 0, 0.1);
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, #D4AF37 0%, #F9E29C 50%, #D4AF37 100%);
+}
+
+.maroon-gradient {
+  background: linear-gradient(135deg, #800000 0%, #A52A2A 100%);
+}
