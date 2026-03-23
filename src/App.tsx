@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Navbar from './components/Navbar';
 import { 
   Users, 
   Maximize, 
@@ -13,8 +15,6 @@ import {
   MessageCircle, 
   Calendar, 
   Star, 
-  Menu, 
-  X, 
   ChevronRight,
   AirVent,
   Music,
@@ -25,14 +25,9 @@ import {
   ArrowRight,
   ImageOff
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 
 // --- Types ---
-interface NavItem {
-  label: string;
-  href: string;
-}
-
 interface EventType {
   title: string;
   description: string;
@@ -45,15 +40,6 @@ interface Facility {
 }
 
 // --- Constants ---
-const NAV_ITEMS: NavItem[] = [
-  { label: 'Home', href: '#home' },
-  { label: 'About', href: '#about' },
-  { label: 'Events', href: '#events' },
-  { label: 'Facilities', href: '#facilities' },
-  { label: 'Gallery', href: '#gallery' },
-  { label: 'Contact', href: '#contact' },
-];
-
 const EVENT_TYPES: EventType[] = [
   { 
     title: 'Weddings & Receptions', 
@@ -88,7 +74,9 @@ const FACILITIES: Facility[] = [
   { name: 'Lift & Wheelchair Access', icon: <Users className="w-6 h-6" /> },
 ];
 
-const GALLERY_IMAGES = [
+const API = import.meta.env.VITE_API_URL || '';
+
+const DEFAULT_GALLERY_IMAGES = [
   'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800',
   'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
   'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=800',
@@ -135,94 +123,58 @@ const GalleryImage = ({ src, alt, index }: { src: string; alt: string; index: nu
 };
 
 export default function App() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
+  const [galleryImages, setGalleryImages] = useState<string[]>(DEFAULT_GALLERY_IMAGES);
+  const [formData, setFormData] = useState({ name: '', phone: '', eventType: 'Wedding', eventDate: '', message: '' });
+  const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+  const fetchGallery = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/api/gallery`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.length > 0) {
+          setGalleryImages(data.map((img: { imageUrl: string }) => img.imageUrl));
+        }
+      }
+    } catch { /* fallback to defaults */ }
   }, []);
+
+  useEffect(() => { fetchGallery(); }, [fetchGallery]);
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormStatus('sending');
+    try {
+      const res = await fetch(`${API}/api/contacts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        setFormStatus('success');
+        setFormData({ name: '', phone: '', eventType: 'Wedding', eventDate: '', message: '' });
+        setTimeout(() => setFormStatus('idle'), 4000);
+      } else {
+        setFormStatus('error');
+        setTimeout(() => setFormStatus('idle'), 3000);
+      }
+    } catch {
+      setFormStatus('error');
+      setTimeout(() => setFormStatus('idle'), 3000);
+    }
+  };
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id.replace('#', ''));
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
-      setIsMenuOpen(false);
     }
   };
 
   return (
     <div className="min-h-screen">
-      {/* --- Navigation --- */}
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-ivory/95 backdrop-blur-md py-3 shadow-md' : 'bg-transparent py-6'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="flex items-center cursor-pointer" onClick={() => scrollToSection('#home')}>
-            <span className={`text-2xl font-serif font-bold tracking-tight ${scrolled ? 'text-maroon' : 'text-white'}`}>
-              AMARAVATHI
-              <span className={`block text-xs font-sans tracking-[0.3em] uppercase ${scrolled ? 'text-gold' : 'text-gold'}`}>Conventions</span>
-            </span>
-          </div>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
-            {NAV_ITEMS.map((item) => (
-              <button
-                key={item.label}
-                onClick={() => scrollToSection(item.href)}
-                className={`text-sm font-medium uppercase tracking-widest transition-colors hover:text-gold ${scrolled ? 'text-charcoal' : 'text-white'}`}
-              >
-                {item.label}
-              </button>
-            ))}
-            <button 
-              onClick={() => scrollToSection('#contact')}
-              className="bg-maroon text-white px-6 py-2 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-maroon/90 transition-all luxury-shadow"
-            >
-              Book Now
-            </button>
-          </div>
-
-          {/* Mobile Menu Toggle */}
-          <div className="md:hidden">
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={scrolled ? 'text-charcoal' : 'text-white'}>
-              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-ivory pt-24 px-6 md:hidden"
-          >
-            <div className="flex flex-col space-y-6">
-              {NAV_ITEMS.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => scrollToSection(item.href)}
-                  className="text-2xl font-serif text-maroon text-left border-b border-maroon/10 pb-4"
-                >
-                  {item.label}
-                </button>
-              ))}
-              <button 
-                onClick={() => scrollToSection('#contact')}
-                className="bg-maroon text-white w-full py-4 rounded-xl text-lg font-bold uppercase tracking-widest"
-              >
-                Book Venue
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <Navbar transparent={true} />
 
       {/* --- Hero Section --- */}
       <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -261,7 +213,7 @@ export default function App() {
           >
             <button 
               onClick={() => scrollToSection('#contact')}
-              className="w-full sm:w-auto bg-gold text-maroon px-10 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-white transition-all luxury-shadow"
+              className="w-full sm:w-auto gold-gradient text-maroon px-10 py-4 rounded-full font-bold uppercase tracking-widest hover:opacity-90 transition-all luxury-shadow"
             >
               Book Venue
             </button>
@@ -289,7 +241,7 @@ export default function App() {
               <option>Corporate</option>
               <option>Other</option>
             </select>
-            <button className="w-full bg-maroon text-white py-3 rounded-lg font-bold uppercase text-xs tracking-widest hover:bg-maroon/90 transition-all">
+            <button className="w-full gold-gradient text-maroon py-3 rounded-lg font-bold uppercase text-xs tracking-widest hover:opacity-90 transition-all">
               Check Availability
             </button>
           </form>
@@ -431,7 +383,7 @@ export default function App() {
               </p>
               <button 
                 onClick={() => scrollToSection('#contact')}
-                className="bg-gold text-maroon px-8 py-3 rounded-full font-bold uppercase tracking-widest hover:bg-white transition-all"
+                className="gold-gradient text-maroon px-8 py-3 rounded-full font-bold uppercase tracking-widest hover:opacity-90 transition-all"
               >
                 View All Facilities
               </button>
@@ -463,13 +415,13 @@ export default function App() {
               <p className="text-gold font-sans font-semibold tracking-widest uppercase mb-4">Visual Journey</p>
               <h2 className="text-4xl md:text-5xl font-serif text-maroon">Our Gallery</h2>
             </div>
-            <button className="text-maroon font-bold uppercase tracking-widest flex items-center gap-2 hover:text-gold transition-colors">
-              View Full Gallery <ChevronRight size={20} />
+            <button onClick={() => navigate('/gallery')} className="gold-gradient text-maroon px-12 py-4 rounded-full font-bold uppercase tracking-[0.2em] text-sm hover:opacity-90 transition-all luxury-shadow">
+              The Full Collection
             </button>
           </div>
 
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-            {GALLERY_IMAGES.map((img, i) => (
+            {galleryImages.map((img, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -484,18 +436,18 @@ export default function App() {
       </section>
 
       {/* --- Testimonials --- */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-ivory">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <p className="text-gold font-sans font-semibold tracking-widest uppercase mb-4">Client Stories</p>
-            <h2 className="text-4xl md:text-5xl font-serif text-maroon">What Our Guests Say</h2>
+            <p className="text-gold font-sans font-semibold tracking-[0.3em] uppercase mb-4">Kind Words</p>
+            <h2 className="text-4xl md:text-5xl font-serif text-maroon">Guest Experiences</h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { name: 'Srinivas Rao', role: 'Wedding Host', text: 'The interiors are absolutely stunning. Our wedding was a dream come true. The staff was incredibly helpful throughout the event.' },
-              { name: 'Priya Sharma', role: 'Corporate Event Manager', text: 'Perfect location in the heart of the city. The facilities are top-notch and the AC was excellent even with a full house.' },
-              { name: 'Anil Kumar', role: 'Birthday Party Host', text: 'Very budget-friendly without compromising on luxury. The dining hall is spacious and the catering service was superb.' },
+              { name: 'Srinivas Rao', initial: 'S', role: 'Wedding Client', text: 'The most elegant venue in Vijayawada. The staff was incredibly professional and the hall setup was breathtaking.' },
+              { name: 'Ananya Sharma', initial: 'A', role: 'Corporate Event', text: 'Perfect location for our product launch. The central AC and sound system were top-notch. Highly recommended!' },
+              { name: 'Prakash Reddy', initial: 'P', role: 'Private Party', text: 'Spacious, clean, and very well-maintained. The valet parking made it so easy for our 500+ guests.' },
             ].map((testimonial, i) => (
               <motion.div
                 key={i}
@@ -503,18 +455,22 @@ export default function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="p-10 bg-ivory rounded-3xl luxury-shadow relative"
+                className="p-8 bg-white rounded-2xl border border-maroon/5 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-default flex flex-col justify-between"
               >
-                <div className="flex text-gold mb-6">
-                  {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
-                </div>
-                <p className="text-charcoal/80 italic mb-8 leading-relaxed">"{testimonial.text}"</p>
                 <div>
-                  <p className="font-serif text-maroon text-lg">{testimonial.name}</p>
-                  <p className="text-xs uppercase tracking-widest text-gold font-semibold">{testimonial.role}</p>
+                  <div className="flex text-gold mb-6">
+                    {[...Array(5)].map((_, j) => <Star key={j} size={14} fill="currentColor" />)}
+                  </div>
+                  <p className="text-charcoal/70 italic mb-8 leading-relaxed font-serif">"{testimonial.text}"</p>
                 </div>
-                <div className="absolute top-10 right-10 text-gold/10">
-                  <Star size={80} fill="currentColor" />
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full gold-gradient flex items-center justify-center text-maroon font-bold text-sm">
+                    {testimonial.initial}
+                  </div>
+                  <div>
+                    <p className="font-serif text-maroon text-base font-semibold">{testimonial.name}</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-gold font-semibold">{testimonial.role}</p>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -605,18 +561,18 @@ export default function App() {
             </div>
             
             <div className="lg:col-span-3 p-12">
-              <form className="grid sm:grid-cols-2 gap-6">
+              <form onSubmit={handleContactSubmit} className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-maroon/60">Full Name</label>
-                  <input type="text" className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors" placeholder="John Doe" />
+                  <input type="text" value={formData.name} onChange={e => setFormData(p => ({...p, name: e.target.value}))} className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors" placeholder="John Doe" required />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-maroon/60">Phone Number</label>
-                  <input type="tel" className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors" placeholder="+91 98765 43210" />
+                  <input type="tel" value={formData.phone} onChange={e => setFormData(p => ({...p, phone: e.target.value}))} className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors" placeholder="+91 98765 43210" required />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-maroon/60">Event Type</label>
-                  <select className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors bg-transparent">
+                  <select value={formData.eventType} onChange={e => setFormData(p => ({...p, eventType: e.target.value}))} className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors bg-transparent">
                     <option>Wedding</option>
                     <option>Corporate</option>
                     <option>Exhibition</option>
@@ -625,16 +581,22 @@ export default function App() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-maroon/60">Event Date</label>
-                  <input type="date" className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors" />
+                  <input type="date" value={formData.eventDate} onChange={e => setFormData(p => ({...p, eventDate: e.target.value}))} className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors" />
                 </div>
                 <div className="sm:col-span-2 space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-maroon/60">Message (Optional)</label>
-                  <textarea rows={3} className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors resize-none" placeholder="Tell us more about your event..."></textarea>
+                  <textarea rows={3} value={formData.message} onChange={e => setFormData(p => ({...p, message: e.target.value}))} className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors resize-none" placeholder="Tell us more about your event..."></textarea>
                 </div>
                 <div className="sm:col-span-2 pt-4">
-                  <button className="w-full bg-maroon text-white py-5 rounded-2xl font-bold uppercase tracking-widest hover:bg-maroon/90 transition-all luxury-shadow">
-                    Submit Booking Enquiry
-                  </button>
+                  {formStatus === 'success' ? (
+                    <div className="w-full bg-green-500/10 border border-green-500/30 text-green-600 py-5 rounded-2xl font-bold uppercase tracking-widest text-center">
+                      Enquiry Submitted Successfully!
+                    </div>
+                  ) : (
+                    <button type="submit" disabled={formStatus === 'sending'} className="w-full gold-gradient text-maroon py-5 rounded-2xl font-bold uppercase tracking-widest hover:opacity-90 transition-all luxury-shadow disabled:opacity-60">
+                      {formStatus === 'sending' ? 'Submitting...' : formStatus === 'error' ? 'Failed — Try Again' : 'Submit Booking Enquiry'}
+                    </button>
+                  )}
                 </div>
               </form>
             </div>
@@ -643,33 +605,34 @@ export default function App() {
       </section>
 
       {/* --- Footer --- */}
-      <footer className="bg-charcoal text-white py-20">
+      <footer className="bg-[#1a1a1a] text-white pt-16 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-12 mb-16">
-            <div className="col-span-1 md:col-span-2">
-              <span className="text-3xl font-serif font-bold tracking-tight text-white mb-6 block">
-                AMARAVATHI
-                <span className="block text-xs font-sans tracking-[0.3em] uppercase text-gold">Conventions</span>
-              </span>
-              <p className="text-white/50 max-w-md mb-8">
-                Vijayawada’s most prestigious convention center, offering a perfect blend of luxury, tradition, and modern amenities for your grand celebrations.
-              </p>
-              <div className="flex gap-4">
-                {/* Social Icons Placeholder */}
-                {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-gold hover:text-maroon transition-all cursor-pointer">
-                    <Star size={18} />
-                  </div>
-                ))}
-              </div>
-            </div>
-            
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-14">
             <div>
-              <h4 className="font-serif text-xl mb-6">Quick Links</h4>
-              <ul className="space-y-4 text-white/60">
-                {NAV_ITEMS.map(item => (
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-full gold-gradient flex items-center justify-center text-maroon font-bold text-sm">A</div>
+                <span className="text-xl font-serif font-bold tracking-tight">
+                  AMARAVATHI
+                  <span className="block text-[10px] font-sans tracking-[0.3em] uppercase text-gold">Conventions</span>
+                </span>
+              </div>
+              <p className="text-white/40 text-sm leading-relaxed">
+                Vijayawada's premier destination for luxury weddings, corporate events, and grand celebrations. Experience world-class hospitality in the heart of the city.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-serif text-lg mb-6">Quick Links</h4>
+              <ul className="space-y-3 text-white/50 text-sm">
+                {[
+                  { label: 'Home', href: '#home' },
+                  { label: 'About Venue', href: '#about' },
+                  { label: 'Event Types', href: '#events' },
+                  { label: 'Gallery', href: '#gallery' },
+                  { label: 'Contact Us', href: '#contact' },
+                ].map(item => (
                   <li key={item.label}>
-                    <button onClick={() => scrollToSection(item.href)} className="hover:text-gold transition-colors uppercase text-xs tracking-widest font-bold">
+                    <button onClick={() => scrollToSection(item.href)} className="hover:text-gold transition-colors">
                       {item.label}
                     </button>
                   </li>
@@ -678,26 +641,38 @@ export default function App() {
             </div>
 
             <div>
-              <h4 className="font-serif text-xl mb-6">Contact Info</h4>
-              <ul className="space-y-4 text-white/60 text-sm">
-                <li className="flex gap-3">
-                  <MapPin size={18} className="text-gold flex-shrink-0" />
-                  Above Vijaya Krishna Super Bazar, Bundar Road, Vijayawada
-                </li>
-                <li className="flex gap-3">
-                  <Phone size={18} className="text-gold flex-shrink-0" />
-                  +91 99999 99999
-                </li>
-                <li className="flex gap-3">
-                  <MessageCircle size={18} className="text-gold flex-shrink-0" />
-                  info@amaravathiconventions.com
-                </li>
+              <h4 className="font-serif text-lg mb-6">Event Types</h4>
+              <ul className="space-y-3 text-white/50 text-sm">
+                {['Weddings & Receptions', 'Corporate Conferences', 'Product Launches', 'Exhibitions', 'Private Celebrations'].map(item => (
+                  <li key={item}>
+                    <button onClick={() => scrollToSection('#events')} className="hover:text-gold transition-colors">
+                      {item}
+                    </button>
+                  </li>
+                ))}
               </ul>
             </div>
+
+            <div>
+              <h4 className="font-serif text-lg mb-6">Newsletter</h4>
+              <p className="text-white/40 text-sm mb-5 leading-relaxed">
+                Subscribe to get updates on our latest packages and event inspirations.
+              </p>
+              <form className="flex" onSubmit={(e) => e.preventDefault()}>
+                <input
+                  type="email"
+                  placeholder="Email Address"
+                  className="flex-1 bg-white/10 border border-white/10 px-4 py-3 rounded-l-lg text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-gold"
+                />
+                <button className="gold-gradient text-maroon px-4 py-3 rounded-r-lg hover:opacity-90 transition-all">
+                  <ArrowRight size={18} />
+                </button>
+              </form>
+            </div>
           </div>
-          
-          <div className="pt-8 border-t border-white/10 flex flex-col md:row justify-between items-center gap-4 text-white/40 text-xs uppercase tracking-widest">
-            <p>© 2026 Amaravathi Conventions. All Rights Reserved.</p>
+
+          <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-white/30 text-[11px] uppercase tracking-[0.2em]">
+            <p>&copy; 2026 Amaravathi Conventions. All Rights Reserved.</p>
             <div className="flex gap-8">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
@@ -721,7 +696,7 @@ export default function App() {
       <div className="fixed bottom-8 right-8 z-50 md:hidden">
         <button 
           onClick={() => scrollToSection('#contact')}
-          className="bg-maroon text-white px-6 py-3 rounded-full font-bold uppercase tracking-widest luxury-shadow"
+          className="gold-gradient text-maroon px-6 py-3 rounded-full font-bold uppercase tracking-widest luxury-shadow"
         >
           Book Now
         </button>
