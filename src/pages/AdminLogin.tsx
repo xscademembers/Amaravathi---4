@@ -31,7 +31,9 @@ export default function AdminLogin() {
         setError(data.error || 'Invalid password');
       }
     } catch {
-      setError('Server not reachable. Make sure the backend is running.');
+      setError(
+        'Could not reach the API (port 5000). Stop the dev server and run npm run dev again — it starts both the website and the API.',
+      );
     } finally {
       setLoading(false);
     }

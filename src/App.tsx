@@ -127,6 +127,8 @@ export default function App() {
   const [galleryImages, setGalleryImages] = useState<string[]>(DEFAULT_GALLERY_IMAGES);
   const [formData, setFormData] = useState({ name: '', phone: '', eventType: 'Wedding', eventDate: '', message: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [quickFormData, setQuickFormData] = useState({ name: '', phone: '', eventType: 'Wedding' });
+  const [quickFormStatus, setQuickFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
 
   const fetchGallery = useCallback(async () => {
     try {
@@ -165,6 +167,35 @@ export default function App() {
     }
   };
 
+  const handleQuickContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setQuickFormStatus('sending');
+    try {
+      const res = await fetch(`${API}/api/contacts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: quickFormData.name,
+          phone: quickFormData.phone,
+          eventType: quickFormData.eventType,
+          eventDate: '',
+          message: 'Submitted from Quick Enquiry form',
+        }),
+      });
+      if (res.ok) {
+        setQuickFormStatus('success');
+        setQuickFormData({ name: '', phone: '', eventType: 'Wedding' });
+        setTimeout(() => setQuickFormStatus('idle'), 4000);
+      } else {
+        setQuickFormStatus('error');
+        setTimeout(() => setQuickFormStatus('idle'), 3000);
+      }
+    } catch {
+      setQuickFormStatus('error');
+      setTimeout(() => setQuickFormStatus('idle'), 3000);
+    }
+  };
+
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id.replace('#', ''));
     if (element) {
@@ -174,10 +205,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
-      <Navbar transparent={true} />
+      <Navbar transparent={false} />
 
       {/* --- Hero Section --- */}
-      <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
         <div className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=1920" 
@@ -232,18 +263,45 @@ export default function App() {
         {/* Floating Enquiry Form (Desktop) */}
         <div className="hidden lg:block absolute bottom-12 right-12 z-20 bg-ivory/95 backdrop-blur-md p-8 rounded-2xl luxury-shadow w-80 border border-gold/20">
           <h3 className="text-maroon font-serif text-xl mb-4">Quick Enquiry</h3>
-          <form className="space-y-3">
-            <input type="text" placeholder="Your Name" className="w-full bg-white border border-maroon/10 p-3 rounded-lg text-sm focus:outline-none focus:border-gold" />
-            <input type="tel" placeholder="Phone Number" className="w-full bg-white border border-maroon/10 p-3 rounded-lg text-sm focus:outline-none focus:border-gold" />
-            <select className="w-full bg-white border border-maroon/10 p-3 rounded-lg text-sm focus:outline-none focus:border-gold">
-              <option>Select Event Type</option>
+          <form onSubmit={handleQuickContactSubmit} className="space-y-3">
+            <input
+              type="text"
+              value={quickFormData.name}
+              onChange={(e) => setQuickFormData((p) => ({ ...p, name: e.target.value }))}
+              placeholder="Your Name"
+              className="w-full bg-white border border-maroon/10 p-3 rounded-lg text-sm focus:outline-none focus:border-gold"
+              required
+            />
+            <input
+              type="tel"
+              value={quickFormData.phone}
+              onChange={(e) => setQuickFormData((p) => ({ ...p, phone: e.target.value }))}
+              placeholder="Phone Number"
+              className="w-full bg-white border border-maroon/10 p-3 rounded-lg text-sm focus:outline-none focus:border-gold"
+              required
+            />
+            <select
+              value={quickFormData.eventType}
+              onChange={(e) => setQuickFormData((p) => ({ ...p, eventType: e.target.value }))}
+              className="w-full bg-white border border-maroon/10 p-3 rounded-lg text-sm focus:outline-none focus:border-gold"
+            >
               <option>Wedding</option>
               <option>Corporate</option>
               <option>Other</option>
             </select>
-            <button className="w-full gold-gradient text-maroon py-3 rounded-lg font-bold uppercase text-xs tracking-widest hover:opacity-90 transition-all">
-              Check Availability
-            </button>
+            {quickFormStatus === 'success' ? (
+              <div className="w-full bg-green-500/10 border border-green-500/30 text-green-700 py-3 rounded-lg font-bold uppercase text-xs tracking-widest text-center">
+                Enquiry Sent!
+              </div>
+            ) : (
+              <button
+                type="submit"
+                disabled={quickFormStatus === 'sending'}
+                className="w-full gold-gradient text-maroon py-3 rounded-lg font-bold uppercase text-xs tracking-widest hover:opacity-90 transition-all disabled:opacity-60"
+              >
+                {quickFormStatus === 'sending' ? 'Sending...' : quickFormStatus === 'error' ? 'Try Again' : 'Check Availability'}
+              </button>
+            )}
           </form>
         </div>
       </section>
@@ -436,7 +494,7 @@ export default function App() {
       </section>
 
       {/* --- Testimonials --- */}
-      <section className="py-24 bg-ivory">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <p className="text-gold font-sans font-semibold tracking-[0.3em] uppercase mb-4">Kind Words</p>
@@ -540,65 +598,81 @@ export default function App() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="bg-white rounded-[3rem] overflow-hidden luxury-shadow grid lg:grid-cols-5">
-            <div className="lg:col-span-2 bg-maroon p-12 text-white flex flex-col justify-between">
-              <div>
-                <h2 className="text-4xl font-serif mb-6">Plan Your Perfect Event With Us</h2>
-                <p className="text-white/70 mb-10">
-                  Ready to host an unforgettable celebration? Fill out the form and our event specialists will get back to you within 24 hours.
+          <div className="bg-white rounded-[2.5rem] overflow-hidden luxury-shadow border border-gold/20">
+            <div className="grid lg:grid-cols-2">
+              <div className="bg-maroon text-white p-10 md:p-14 relative">
+                <div className="absolute top-0 right-0 w-56 h-56 bg-gold/10 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3"></div>
+                <p className="text-gold font-semibold text-xs tracking-[0.25em] uppercase mb-4 relative">Reserve Your Date</p>
+                <h2 className="text-4xl md:text-5xl font-serif leading-tight mb-6 relative">
+                  Plan Your Perfect Event With Us
+                </h2>
+                <p className="text-white/75 leading-relaxed mb-10 relative">
+                  Share your event details and our team will help you with availability, pricing, and the best package options within 24 hours.
                 </p>
-              </div>
-              <div className="space-y-6">
-                <a href="tel:+919999999999" className="flex items-center gap-4 hover:text-gold transition-colors">
-                  <div className="bg-white/10 p-3 rounded-xl"><Phone size={20} /></div>
-                  <span className="font-bold tracking-widest uppercase text-sm">+91 99999 99999</span>
-                </a>
-                <a href="https://wa.me/919999999999" className="flex items-center gap-4 hover:text-gold transition-colors">
-                  <div className="bg-white/10 p-3 rounded-xl"><MessageCircle size={20} /></div>
-                  <span className="font-bold tracking-widest uppercase text-sm">WhatsApp Enquiry</span>
-                </a>
-              </div>
-            </div>
-            
-            <div className="lg:col-span-3 p-12">
-              <form onSubmit={handleContactSubmit} className="grid sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-maroon/60">Full Name</label>
-                  <input type="text" value={formData.name} onChange={e => setFormData(p => ({...p, name: e.target.value}))} className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors" placeholder="John Doe" required />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-maroon/60">Phone Number</label>
-                  <input type="tel" value={formData.phone} onChange={e => setFormData(p => ({...p, phone: e.target.value}))} className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors" placeholder="+91 98765 43210" required />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-maroon/60">Event Type</label>
-                  <select value={formData.eventType} onChange={e => setFormData(p => ({...p, eventType: e.target.value}))} className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors bg-transparent">
-                    <option>Wedding</option>
-                    <option>Corporate</option>
-                    <option>Exhibition</option>
-                    <option>Private Party</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-maroon/60">Event Date</label>
-                  <input type="date" value={formData.eventDate} onChange={e => setFormData(p => ({...p, eventDate: e.target.value}))} className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors" />
-                </div>
-                <div className="sm:col-span-2 space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-maroon/60">Message (Optional)</label>
-                  <textarea rows={3} value={formData.message} onChange={e => setFormData(p => ({...p, message: e.target.value}))} className="w-full border-b-2 border-maroon/10 py-3 focus:outline-none focus:border-maroon transition-colors resize-none" placeholder="Tell us more about your event..."></textarea>
-                </div>
-                <div className="sm:col-span-2 pt-4">
-                  {formStatus === 'success' ? (
-                    <div className="w-full bg-green-500/10 border border-green-500/30 text-green-600 py-5 rounded-2xl font-bold uppercase tracking-widest text-center">
-                      Enquiry Submitted Successfully!
+
+                <div className="space-y-4 relative">
+                  <a href="tel:+919999999999" className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl hover:border-gold/40 transition-colors">
+                    <div className="bg-white/10 p-3 rounded-xl text-gold"><Phone size={20} /></div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-white/50">Call Us</p>
+                      <p className="font-semibold tracking-wide">+91 99999 99999</p>
                     </div>
-                  ) : (
-                    <button type="submit" disabled={formStatus === 'sending'} className="w-full gold-gradient text-maroon py-5 rounded-2xl font-bold uppercase tracking-widest hover:opacity-90 transition-all luxury-shadow disabled:opacity-60">
-                      {formStatus === 'sending' ? 'Submitting...' : formStatus === 'error' ? 'Failed — Try Again' : 'Submit Booking Enquiry'}
-                    </button>
-                  )}
+                  </a>
+                  <a href="https://wa.me/919999999999" className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl hover:border-gold/40 transition-colors">
+                    <div className="bg-white/10 p-3 rounded-xl text-gold"><MessageCircle size={20} /></div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-white/50">Instant Support</p>
+                      <p className="font-semibold tracking-wide">WhatsApp Enquiry</p>
+                    </div>
+                  </a>
                 </div>
-              </form>
+              </div>
+
+              <div className="p-8 md:p-12 bg-ivory/30">
+                <div className="mb-8">
+                  <p className="text-gold font-semibold text-xs tracking-[0.22em] uppercase mb-3">Booking Request</p>
+                  <h3 className="text-3xl font-serif text-maroon">Tell Us About Your Event</h3>
+                </div>
+
+                <form onSubmit={handleContactSubmit} className="grid sm:grid-cols-2 gap-5">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-maroon/60">Full Name</label>
+                    <input type="text" value={formData.name} onChange={e => setFormData(p => ({...p, name: e.target.value}))} className="w-full bg-white border border-maroon/15 rounded-xl px-4 py-3 focus:outline-none focus:border-gold transition-colors" placeholder="John Doe" required />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-maroon/60">Phone Number</label>
+                    <input type="tel" value={formData.phone} onChange={e => setFormData(p => ({...p, phone: e.target.value}))} className="w-full bg-white border border-maroon/15 rounded-xl px-4 py-3 focus:outline-none focus:border-gold transition-colors" placeholder="+91 98765 43210" required />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-maroon/60">Event Type</label>
+                    <select value={formData.eventType} onChange={e => setFormData(p => ({...p, eventType: e.target.value}))} className="w-full bg-white border border-maroon/15 rounded-xl px-4 py-3 focus:outline-none focus:border-gold transition-colors">
+                      <option>Wedding</option>
+                      <option>Corporate</option>
+                      <option>Exhibition</option>
+                      <option>Private Party</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-maroon/60">Event Date</label>
+                    <input type="date" value={formData.eventDate} onChange={e => setFormData(p => ({...p, eventDate: e.target.value}))} className="w-full bg-white border border-maroon/15 rounded-xl px-4 py-3 focus:outline-none focus:border-gold transition-colors" />
+                  </div>
+                  <div className="sm:col-span-2 space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-maroon/60">Message (Optional)</label>
+                    <textarea rows={4} value={formData.message} onChange={e => setFormData(p => ({...p, message: e.target.value}))} className="w-full bg-white border border-maroon/15 rounded-xl px-4 py-3 focus:outline-none focus:border-gold transition-colors resize-none" placeholder="Tell us more about your event..."></textarea>
+                  </div>
+                  <div className="sm:col-span-2 pt-2">
+                    {formStatus === 'success' ? (
+                      <div className="w-full bg-green-500/10 border border-green-500/30 text-green-700 py-4 rounded-xl font-bold uppercase tracking-widest text-center text-sm">
+                        Enquiry Submitted Successfully!
+                      </div>
+                    ) : (
+                      <button type="submit" disabled={formStatus === 'sending'} className="w-full gold-gradient text-maroon py-4 rounded-xl font-bold uppercase tracking-[0.18em] text-sm hover:opacity-90 transition-all luxury-shadow disabled:opacity-60">
+                        {formStatus === 'sending' ? 'Submitting...' : formStatus === 'error' ? 'Failed - Try Again' : 'Submit Booking Enquiry'}
+                      </button>
+                    )}
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>

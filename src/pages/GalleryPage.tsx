@@ -80,9 +80,10 @@ export default function GalleryPage() {
   }, [lightbox, images.length]);
 
   return (
-    <div className="min-h-screen bg-ivory">
+    <div className="min-h-screen bg-ivory flex flex-col">
       <Navbar transparent={false} />
 
+      <div className="flex-1 flex flex-col">
       {/* Hero */}
       <section className="pt-28 pb-16 text-center">
         <motion.p
@@ -132,6 +133,7 @@ export default function GalleryPage() {
           </div>
         )}
       </section>
+      </div>
 
       {/* Lightbox */}
       <AnimatePresence>
@@ -184,7 +186,7 @@ export default function GalleryPage() {
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="bg-[#1a1a1a] py-8 text-center">
+      <footer className="mt-auto shrink-0 bg-[#1a1a1a] py-8 text-center">
         <p className="text-white/30 text-[11px] uppercase tracking-[0.2em]">
           &copy; 2026 Amaravathi Conventions. All Rights Reserved.
         </p>

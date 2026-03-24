@@ -43,7 +43,13 @@ export default function Navbar({ transparent = true }: NavbarProps) {
 
   return (
     <>
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${showSolid ? 'bg-ivory/95 backdrop-blur-md py-3 shadow-md' : 'bg-transparent py-6'}`}>
+      <nav
+        className={`fixed w-full z-50 transition-all duration-300 ${
+          showSolid
+            ? 'bg-white border-b border-maroon/10 py-3 shadow-sm'
+            : 'bg-transparent py-6'
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center cursor-pointer" onClick={() => handleNav('#home')}>
             <span className={`text-2xl font-serif font-bold tracking-tight ${showSolid ? 'text-maroon' : 'text-white'}`}>
