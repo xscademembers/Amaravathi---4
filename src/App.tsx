@@ -127,8 +127,6 @@ export default function App() {
   const [galleryImages, setGalleryImages] = useState<string[]>(DEFAULT_GALLERY_IMAGES);
   const [formData, setFormData] = useState({ name: '', phone: '', eventType: 'Wedding', eventDate: '', message: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
-  const [quickFormData, setQuickFormData] = useState({ name: '', phone: '', eventType: 'Wedding' });
-  const [quickFormStatus, setQuickFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
 
   const fetchGallery = useCallback(async () => {
     try {
@@ -164,35 +162,6 @@ export default function App() {
     } catch {
       setFormStatus('error');
       setTimeout(() => setFormStatus('idle'), 3000);
-    }
-  };
-
-  const handleQuickContactSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setQuickFormStatus('sending');
-    try {
-      const res = await fetch(`${API}/api/contacts`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: quickFormData.name,
-          phone: quickFormData.phone,
-          eventType: quickFormData.eventType,
-          eventDate: '',
-          message: 'Submitted from Quick Enquiry form',
-        }),
-      });
-      if (res.ok) {
-        setQuickFormStatus('success');
-        setQuickFormData({ name: '', phone: '', eventType: 'Wedding' });
-        setTimeout(() => setQuickFormStatus('idle'), 4000);
-      } else {
-        setQuickFormStatus('error');
-        setTimeout(() => setQuickFormStatus('idle'), 3000);
-      }
-    } catch {
-      setQuickFormStatus('error');
-      setTimeout(() => setQuickFormStatus('idle'), 3000);
     }
   };
 
@@ -260,54 +229,11 @@ export default function App() {
           </motion.div>
         </div>
 
-        {/* Floating Enquiry Form (Desktop) */}
-        <div className="hidden lg:block absolute bottom-12 right-12 z-20 bg-ivory/95 backdrop-blur-md p-8 rounded-2xl luxury-shadow w-80 border border-gold/20">
-          <h3 className="text-maroon font-serif text-xl mb-4">Quick Enquiry</h3>
-          <form onSubmit={handleQuickContactSubmit} className="space-y-3">
-            <input
-              type="text"
-              value={quickFormData.name}
-              onChange={(e) => setQuickFormData((p) => ({ ...p, name: e.target.value }))}
-              placeholder="Your Name"
-              className="w-full bg-white border border-maroon/10 p-3 rounded-lg text-sm focus:outline-none focus:border-gold"
-              required
-            />
-            <input
-              type="tel"
-              value={quickFormData.phone}
-              onChange={(e) => setQuickFormData((p) => ({ ...p, phone: e.target.value }))}
-              placeholder="Phone Number"
-              className="w-full bg-white border border-maroon/10 p-3 rounded-lg text-sm focus:outline-none focus:border-gold"
-              required
-            />
-            <select
-              value={quickFormData.eventType}
-              onChange={(e) => setQuickFormData((p) => ({ ...p, eventType: e.target.value }))}
-              className="w-full bg-white border border-maroon/10 p-3 rounded-lg text-sm focus:outline-none focus:border-gold"
-            >
-              <option>Wedding</option>
-              <option>Corporate</option>
-              <option>Other</option>
-            </select>
-            {quickFormStatus === 'success' ? (
-              <div className="w-full bg-green-500/10 border border-green-500/30 text-green-700 py-3 rounded-lg font-bold uppercase text-xs tracking-widest text-center">
-                Enquiry Sent!
-              </div>
-            ) : (
-              <button
-                type="submit"
-                disabled={quickFormStatus === 'sending'}
-                className="w-full gold-gradient text-maroon py-3 rounded-lg font-bold uppercase text-xs tracking-widest hover:opacity-90 transition-all disabled:opacity-60"
-              >
-                {quickFormStatus === 'sending' ? 'Sending...' : quickFormStatus === 'error' ? 'Try Again' : 'Check Availability'}
-              </button>
-            )}
-          </form>
-        </div>
+
       </section>
 
       {/* --- Highlights Section --- */}
-      <section className="py-20 bg-white">
+      <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
