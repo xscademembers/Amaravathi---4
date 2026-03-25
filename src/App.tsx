@@ -683,12 +683,14 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-14">
             <div>
-              <div className="flex items-center gap-3 mb-6">
-                <img
-                  src="/Logo%20new.png"
-                  alt="Amaravathi Conventions"
-                  className="w-44 h-44 object-contain"
-                />
+              <div className="flex justify-center mb-6">
+                <div className="w-36 h-36 flex items-center justify-center">
+                  <img
+                    src="/Logo%20new.png"
+                    alt="Amaravathi Conventions"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
               </div>
               <p className="text-white/40 text-sm leading-relaxed">
                 Vijayawada's premier destination for luxury weddings, corporate events, and grand celebrations. Experience world-class hospitality in the heart of the city.
