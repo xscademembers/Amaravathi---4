@@ -686,7 +686,7 @@ export default function App() {
               <div className="flex justify-center mb-6">
                 <div className="w-36 h-36 flex items-center justify-center">
                   <img
-                    src="/Logo%20new.png"
+                    src="/Horizontal%20Transprent%20logo.png"
                     alt="Amaravathi Conventions"
                     className="w-full h-full object-contain"
                   />

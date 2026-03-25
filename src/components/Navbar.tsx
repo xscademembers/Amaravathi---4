@@ -53,9 +53,9 @@ export default function Navbar({ transparent = true }: NavbarProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center cursor-pointer gap-3" onClick={() => handleNav('#home')}>
             <img
-              src="/Logo%20new.png"
+              src="/Horizontal%20Transprent%20logo.png"
               alt="Amaravathi Conventions"
-              className="h-30 w-30 object-contain"
+              className="h-26 w-44 object-contain"
             />
           </div>
 
@@ -72,7 +72,7 @@ export default function Navbar({ transparent = true }: NavbarProps) {
             ))}
             <button
               onClick={() => handleNav('#contact')}
-              className="gold-gradient text-maroon px-6 py-2 rounded-full text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-all luxury-shadow"
+              className="gold-gradient text-maroon px-6 py-1.5 rounded-full text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-all luxury-shadow"
             >
               Book Now
             </button>
@@ -81,7 +81,7 @@ export default function Navbar({ transparent = true }: NavbarProps) {
           {/* Mobile Menu Toggle */}
           <div className="md:hidden">
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={showSolid ? 'text-charcoal' : 'text-white'}>
-              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
