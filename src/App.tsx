@@ -208,7 +208,7 @@ export default function App() {
       <Navbar transparent={false} />
 
       {/* --- Hero Section --- */}
-      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-12">
         <div className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=1920" 
@@ -249,7 +249,7 @@ export default function App() {
               Book Venue
             </button>
             <a 
-              href="https://wa.me/919999999999" 
+              href="https://wa.me/919000387878" 
               target="_blank" 
               rel="noopener noreferrer"
               className="w-full sm:w-auto bg-white/10 backdrop-blur-md border border-white/20 text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-white/20 transition-all flex items-center justify-center gap-2"
@@ -554,7 +554,7 @@ export default function App() {
                   </div>
                   <div>
                     <h4 className="font-serif text-xl text-maroon mb-1">Address</h4>
-                    <p className="text-charcoal/70">Above Vijaya Krishna Super Bazar, Near Ragavaiah Park, Bundar Road, Vijayawada, AP 520002</p>
+                    <p className="text-charcoal/70">Amaravathi Conventions, Above Vijaya Krishna Super Bazar, Bunder Road, Vijayawada - 520 002</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -563,8 +563,8 @@ export default function App() {
                   </div>
                   <div>
                     <h4 className="font-serif text-xl text-maroon mb-1">Contact</h4>
-                    <p className="text-charcoal/70">+91 99999 99999</p>
-                    <p className="text-charcoal/70">info@amaravathiconventions.com</p>
+                    <p className="text-charcoal/70">+91 90003 87878</p>
+                    <p className="text-charcoal/70">amaravathiconventions@gmail.com</p>
                   </div>
                 </div>
               </div>
@@ -577,7 +577,7 @@ export default function App() {
               className="h-[450px] rounded-3xl overflow-hidden luxury-shadow border-4 border-white"
             >
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3825.46747192454!2d80.6274473!3d16.5025044!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35f00000000001%3A0x0000000000000000!2sAmaravathi%20Conventions!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin" 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30602.714261003697!2d80.58602367431642!3d16.508960400000007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35f00302c5ea47%3A0xd4339665f95e2d8c!2sAmaravati%20Conventions!5e0!3m2!1sen!2sus!4v1774422510261!5m2!1sen!2sus" 
                 width="100%" 
                 height="100%" 
                 style={{ border: 0 }} 
@@ -611,14 +611,14 @@ export default function App() {
                 </p>
 
                 <div className="space-y-4 relative">
-                  <a href="tel:+919999999999" className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl hover:border-gold/40 transition-colors">
+                  <a href="tel:+919000387878" className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl hover:border-gold/40 transition-colors">
                     <div className="bg-white/10 p-3 rounded-xl text-gold"><Phone size={20} /></div>
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.2em] text-white/50">Call Us</p>
-                      <p className="font-semibold tracking-wide">+91 99999 99999</p>
+                      <p className="font-semibold tracking-wide">+91 90003 87878</p>
                     </div>
                   </a>
-                  <a href="https://wa.me/919999999999" className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl hover:border-gold/40 transition-colors">
+                  <a href="https://wa.me/919000387878" className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl hover:border-gold/40 transition-colors">
                     <div className="bg-white/10 p-3 rounded-xl text-gold"><MessageCircle size={20} /></div>
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.2em] text-white/50">Instant Support</p>
@@ -684,11 +684,11 @@ export default function App() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-14">
             <div>
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full gold-gradient flex items-center justify-center text-maroon font-bold text-sm">A</div>
-                <span className="text-xl font-serif font-bold tracking-tight">
-                  AMARAVATHI
-                  <span className="block text-[10px] font-sans tracking-[0.3em] uppercase text-gold">Conventions</span>
-                </span>
+                <img
+                  src="/Logo%20new.png"
+                  alt="Amaravathi Conventions"
+                  className="w-44 h-44 object-contain"
+                />
               </div>
               <p className="text-white/40 text-sm leading-relaxed">
                 Vijayawada's premier destination for luxury weddings, corporate events, and grand celebrations. Experience world-class hospitality in the heart of the city.
@@ -758,7 +758,7 @@ export default function App() {
       {/* --- Sticky Elements --- */}
       <div className="fixed bottom-8 left-8 z-50">
         <a 
-          href="https://wa.me/919999999999" 
+          href="https://wa.me/919000387878" 
           target="_blank" 
           rel="noopener noreferrer"
           className="bg-[#25D366] text-white p-4 rounded-full luxury-shadow hover:scale-110 transition-transform block"

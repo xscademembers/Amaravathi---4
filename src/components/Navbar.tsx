@@ -46,16 +46,17 @@ export default function Navbar({ transparent = true }: NavbarProps) {
       <nav
         className={`fixed w-full z-50 transition-all duration-300 ${
           showSolid
-            ? 'bg-white border-b border-maroon/10 py-3 shadow-sm'
+            ? 'bg-white border-b border-maroon/10 py-0 shadow-sm'
             : 'bg-transparent py-6'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="flex items-center cursor-pointer" onClick={() => handleNav('#home')}>
-            <span className={`text-2xl font-serif font-bold tracking-tight ${showSolid ? 'text-maroon' : 'text-white'}`}>
-              AMARAVATHI
-              <span className="block text-xs font-sans tracking-[0.3em] uppercase text-gold">Conventions</span>
-            </span>
+          <div className="flex items-center cursor-pointer gap-3" onClick={() => handleNav('#home')}>
+            <img
+              src="/Logo%20new.png"
+              alt="Amaravathi Conventions"
+              className="h-30 w-30 object-contain"
+            />
           </div>
 
           {/* Desktop Menu */}
