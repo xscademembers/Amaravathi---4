@@ -104,7 +104,6 @@ const FACILITIES: Facility[] = [
   { name: 'Kitchen', icon: <ShieldCheck className="w-6 h-6" /> },
   { name: 'Utensils', icon: <ShieldCheck className="w-6 h-6" /> },
   { name: 'RO Water Plant', icon: <ShieldCheck className="w-6 h-6" /> },
-  { name: 'Fire Fighting System', icon: <ShieldCheck className="w-6 h-6" /> },
 ];
 
 const API = import.meta.env.VITE_API_URL || '';
@@ -438,7 +437,7 @@ export default function App() {
           </div>
 
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-            {galleryImages.map((img, i) => (
+            {galleryImages.slice(0, 10).map((img, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
