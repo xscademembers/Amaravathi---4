@@ -52,26 +52,59 @@ const EVENT_TYPES: EventType[] = [
     image: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80&w=800'
   },
   { 
-    title: 'Exhibitions & Expos', 
+    title: 'Exhibitions & Expos',
     description: 'Spacious layouts perfect for trade shows, art exhibitions, and lifestyle expos.',
     image: 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&q=80&w=800'
   },
   { 
-    title: 'Private Celebrations', 
+    title: 'Private Celebrations',
     description: 'Intimate spaces for birthdays, anniversaries, and traditional ceremonies.',
     image: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    title: 'Product Launches',
+    description: 'Launch your brand with impact in a premium venue built for visibility and engagement.',
+    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    title: 'Cultural & Religious Events',
+    description: 'A versatile setting for cultural gatherings, spiritual functions, and community celebrations.',
+    image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    title: 'College Events & Fests',
+    description: 'Host vibrant student events, fests, and annual celebrations with full event support.',
+    image: 'https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    title: 'Government & Political Events',
+    description: 'Reliable infrastructure and spacious arrangements for large formal gatherings and public events.',
+    image: 'https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?auto=format&fit=crop&q=80&w=800'
   },
 ];
 
 const FACILITIES: Facility[] = [
-  { name: 'Central Air Conditioning', icon: <AirVent className="w-6 h-6" /> },
+  { name: 'Air Conditioning', icon: <AirVent className="w-6 h-6" /> },
   { name: 'Stage & Sound System', icon: <Music className="w-6 h-6" /> },
-  { name: 'In-house & External Catering', icon: <Utensils className="w-6 h-6" /> },
-  { name: 'Valet & Ample Parking', icon: <Car className="w-6 h-6" /> },
-  { name: 'Bridal & Green Rooms', icon: <Users className="w-6 h-6" /> },
+  { name: 'In-house Catering', icon: <Utensils className="w-6 h-6" /> },
+  { name: 'External Catering Allowed', icon: <Utensils className="w-6 h-6" /> },
+  { name: 'Valet Parking', icon: <Car className="w-6 h-6" /> },
+  { name: 'Ample Parking Space', icon: <Car className="w-6 h-6" /> },
+  { name: 'Bridal Room', icon: <Users className="w-6 h-6" /> },
+  { name: 'Green Room', icon: <Users className="w-6 h-6" /> },
+  { name: 'Generator Backup', icon: <ShieldCheck className="w-6 h-6" /> },
+  { name: 'Lift', icon: <Users className="w-6 h-6" /> },
+  { name: 'Wheelchair Accessibility', icon: <Users className="w-6 h-6" /> },
   { name: 'CCTV & Security', icon: <ShieldCheck className="w-6 h-6" /> },
-  { name: 'Lighting & Decoration', icon: <Lightbulb className="w-6 h-6" /> },
-  { name: 'Lift & Wheelchair Access', icon: <Users className="w-6 h-6" /> },
+  { name: 'Decoration Services', icon: <Lightbulb className="w-6 h-6" /> },
+  { name: 'Lighting Setup', icon: <Lightbulb className="w-6 h-6" /> },
+  { name: 'Chairs', icon: <ShieldCheck className="w-6 h-6" /> },
+  { name: 'Chair Covers', icon: <ShieldCheck className="w-6 h-6" /> },
+  { name: 'Dining Tables', icon: <ShieldCheck className="w-6 h-6" /> },
+  { name: 'Kitchen', icon: <ShieldCheck className="w-6 h-6" /> },
+  { name: 'Utensils', icon: <ShieldCheck className="w-6 h-6" /> },
+  { name: 'RO Water Plant', icon: <ShieldCheck className="w-6 h-6" /> },
+  { name: 'Fire Fighting System', icon: <ShieldCheck className="w-6 h-6" /> },
 ];
 
 const API = import.meta.env.VITE_API_URL || '';
@@ -215,7 +248,7 @@ export default function App() {
               onClick={() => scrollToSection('#contact')}
               className="w-full sm:w-auto gold-gradient text-maroon px-10 py-4 rounded-full font-bold uppercase tracking-widest hover:opacity-90 transition-all luxury-shadow"
             >
-              Book Venue
+              Enquiry Now
             </button>
             <a 
               href="https://wa.me/919000387878" 
@@ -237,10 +270,10 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { icon: <Users className="text-gold w-8 h-8" />, label: '700 Guests', sub: 'Floating Capacity' },
-              { icon: <Maximize className="text-gold w-8 h-8" />, label: '8000 sq ft', sub: 'Main Event Hall' },
-              { icon: <MapPin className="text-gold w-8 h-8" />, label: 'Prime Location', sub: 'Heart of Vijayawada' },
-              { icon: <Calendar className="text-gold w-8 h-8" />, label: 'All Events', sub: 'Custom Packages' },
+              { icon: <Users className="text-gold w-8 h-8" />, label: '400 Seating', sub: '700 Standing Capacity' },
+              { icon: <Maximize className="text-gold w-8 h-8" />, label: '8000 + 5000 sq ft', sub: 'Hall + Canopy Space' },
+              { icon: <MapPin className="text-gold w-8 h-8" />, label: 'Prime Main Road', sub: '1 km from Bus & Rail' },
+              { icon: <Calendar className="text-gold w-8 h-8" />, label: 'All Event Types', sub: 'Fixed & Custom Packages' },
             ].map((stat, i) => (
               <motion.div 
                 key={i}
@@ -291,7 +324,7 @@ export default function App() {
               <p className="text-gold font-sans font-semibold tracking-widest uppercase mb-4">Welcome to Amaravathi</p>
               <h2 className="text-4xl md:text-5xl font-serif text-maroon mb-8 leading-tight">Where Grandeur Meets <span className="italic">Tradition</span></h2>
               <p className="text-charcoal/80 mb-6 leading-relaxed">
-                Located in the heart of Vijayawada, Amaravathi Conventions stands as a beacon of luxury and elegance. Our venue is designed to host the most prestigious events, from royal weddings to high-profile corporate conferences.
+                Located in the heart of Vijayawada on the main road, Amaravathi Conventions is just 1 km from the bus station and railway station. Our venue is designed to host everything from grand weddings to high-profile corporate conferences.
               </p>
               <div className="space-y-4 mb-10">
                 {[
@@ -475,8 +508,8 @@ export default function App() {
               <h2 className="text-4xl md:text-5xl font-serif text-maroon mb-8">Prime City Location</h2>
               <div className="space-y-6">
                 <div className="flex gap-4">
-                  <div className="bg-maroon/5 p-4 rounded-2xl text-maroon">
-                    <MapPin size={24} />
+                  <div className="bg-maroon/5 rounded-2xl text-maroon shrink-0 flex size-14 items-center justify-center">
+                    <MapPin size={24} className="shrink-0" strokeWidth={2} aria-hidden />
                   </div>
                   <div>
                     <h4 className="font-serif text-xl text-maroon mb-1">Address</h4>
@@ -484,8 +517,8 @@ export default function App() {
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  <div className="bg-maroon/5 p-4 rounded-2xl text-maroon">
-                    <Phone size={24} />
+                  <div className="bg-maroon/5 rounded-2xl text-maroon shrink-0 flex size-14 items-center justify-center">
+                    <Phone size={24} className="shrink-0" strokeWidth={2} aria-hidden />
                   </div>
                   <div>
                     <h4 className="font-serif text-xl text-maroon mb-1">Contact</h4>
@@ -609,10 +642,10 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-14">
             <div>
-              <div className="flex justify-center mb-6">
-                <div className="w-36 h-36 flex items-center justify-center">
+              <div className="flex justify-center mb-2 -mt-4">
+                <div className="w-56 h-56 flex items-center justify-center">
                   <img
-                    src="/Horizontal%20Transprent%20logo.png"
+                    src="/logo%20accepted.png"
                     alt="Amaravathi Conventions"
                     className="w-full h-full object-contain"
                   />
@@ -700,7 +733,7 @@ export default function App() {
           onClick={() => scrollToSection('#contact')}
           className="gold-gradient text-maroon px-6 py-3 rounded-full font-bold uppercase tracking-widest luxury-shadow"
         >
-          Book Now
+          Enquiry Now
         </button>
       </div>
     </div>

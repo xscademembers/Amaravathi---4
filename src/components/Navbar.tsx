@@ -47,15 +47,15 @@ export default function Navbar({ transparent = true }: NavbarProps) {
         className={`fixed w-full z-50 transition-all duration-300 ${
           showSolid
             ? 'bg-white border-b border-maroon/10 py-0 shadow-sm'
-            : 'bg-transparent py-6'
+            : 'bg-transparent py-3'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center cursor-pointer gap-3" onClick={() => handleNav('#home')}>
             <img
-              src="/Horizontal%20Transprent%20logo.png"
+              src="/1.png"
               alt="Amaravathi Conventions"
-              className="h-26 w-44 object-contain"
+              className="h-30 w-52 object-contain"
             />
           </div>
 
@@ -72,9 +72,9 @@ export default function Navbar({ transparent = true }: NavbarProps) {
             ))}
             <button
               onClick={() => handleNav('#contact')}
-              className="gold-gradient text-maroon px-6 py-1.5 rounded-full text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-all luxury-shadow"
+              className="gold-gradient text-maroon px-6 py-1 rounded-full text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-all luxury-shadow"
             >
-              Book Now
+              Enquiry Now
             </button>
           </div>
 
@@ -110,7 +110,7 @@ export default function Navbar({ transparent = true }: NavbarProps) {
                 onClick={() => handleNav('#contact')}
                 className="gold-gradient text-maroon w-full py-4 rounded-xl text-lg font-bold uppercase tracking-widest"
               >
-                Book Venue
+                Enquiry Now
               </button>
             </div>
           </motion.div>
