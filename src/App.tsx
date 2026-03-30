@@ -454,9 +454,19 @@ export default function App() {
       {/* --- Testimonials --- */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <p className="text-gold font-sans font-semibold tracking-[0.3em] uppercase mb-4">Kind Words</p>
-            <h2 className="text-4xl md:text-5xl font-serif text-maroon">Guest Experiences</h2>
+          <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-4 mb-16">
+            <div className="text-center md:text-left">
+              <p className="text-gold font-sans font-semibold tracking-[0.3em] uppercase mb-4">Kind Words</p>
+              <h2 className="text-4xl md:text-5xl font-serif text-maroon">Guest Experiences</h2>
+            </div>
+            <a
+              href="https://www.google.com/search?sca_esv=eafbc91c2287ff45&rlz=1C1GCEA_enIN1194IN1194&sxsrf=ANbL-n4Itz5uG94gksEmInWKFeUZEb4-zA:1774851959055&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOanTb2_xnxYemQeN8JdSkgTtcQb7_Mhl-xQUO85jfdsha-wHMWFKmKkMNBQUh8H5L4L9mYlg_budy0w-Q65eseYSkACd5ZLd6yXEtJX2Al-er6TmWQ%3D%3D&q=Amaravati+Conventions+Reviews&sa=X&ved=2ahUKEwidnLHk_saTAxVhTGwGHVtNGEMQ0bkNegQIJRAH&biw=1920&bih=919&dpr=1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="gold-gradient text-maroon px-8 py-3 rounded-full font-bold uppercase tracking-[0.25em] text-xs md:text-sm hover:opacity-90 transition-all whitespace-nowrap"
+            >
+              Read More
+            </a>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
