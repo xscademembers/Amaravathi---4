@@ -726,7 +726,7 @@ export default function App() {
       </footer>
 
       {/* --- Sticky Elements --- */}
-      <div className="fixed bottom-24 md:bottom-8 left-4 md:left-8 z-50">
+      <div className="hidden md:block fixed bottom-8 left-8 z-50">
         <a 
           href="https://wa.me/919000387878" 
           target="_blank" 
@@ -737,14 +737,7 @@ export default function App() {
         </a>
       </div>
 
-      <div className="fixed bottom-6 right-4 z-50 md:hidden">
-        <button 
-          onClick={() => scrollToSection('#contact')}
-          className="gold-gradient text-maroon px-6 py-3 rounded-full font-bold uppercase tracking-widest luxury-shadow"
-        >
-          Enquiry Now
-        </button>
-      </div>
+      
     </div>
   );
 }
