@@ -225,7 +225,7 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-gold font-sans font-semibold tracking-[0.3em] uppercase mb-4"
+            className="text-gold font-sans font-semibold tracking-[0.2em] md:tracking-[0.3em] uppercase mb-4"
           >
             Exquisite • Grand • Memorable
           </motion.p>
@@ -245,7 +245,7 @@ export default function App() {
           >
             <button 
               onClick={() => scrollToSection('#contact')}
-              className="w-full sm:w-auto gold-gradient text-maroon px-10 py-4 rounded-full font-bold uppercase tracking-widest hover:opacity-90 transition-all luxury-shadow"
+              className="w-full sm:w-auto gold-gradient text-maroon px-8 md:px-10 py-4 rounded-full font-bold uppercase tracking-[0.14em] md:tracking-widest hover:opacity-90 transition-all luxury-shadow"
             >
               Enquiry Now
             </button>
@@ -253,7 +253,7 @@ export default function App() {
               href="https://wa.me/919000387878" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="w-full sm:w-auto bg-white/10 backdrop-blur-md border border-white/20 text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-white/20 transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-white/10 backdrop-blur-md border border-white/20 text-white px-8 md:px-10 py-4 rounded-full font-bold uppercase tracking-[0.14em] md:tracking-widest hover:bg-white/20 transition-all flex items-center justify-center gap-2"
             >
               <MessageCircle size={20} />
               WhatsApp Us
@@ -431,7 +431,7 @@ export default function App() {
               <p className="text-gold font-sans font-semibold tracking-widest uppercase mb-4">Visual Journey</p>
               <h2 className="text-4xl md:text-5xl font-serif text-maroon">Our Gallery</h2>
             </div>
-            <button onClick={() => navigate('/gallery')} className="gold-gradient text-maroon px-12 py-4 rounded-full font-bold uppercase tracking-[0.2em] text-sm hover:opacity-90 transition-all luxury-shadow">
+            <button onClick={() => navigate('/gallery')} className="gold-gradient text-maroon px-8 md:px-12 py-3.5 md:py-4 rounded-full font-bold uppercase tracking-[0.14em] md:tracking-[0.2em] text-xs md:text-sm hover:opacity-90 transition-all luxury-shadow">
               The Full Collection
             </button>
           </div>
@@ -463,7 +463,7 @@ export default function App() {
               href="https://www.google.com/search?sca_esv=eafbc91c2287ff45&rlz=1C1GCEA_enIN1194IN1194&sxsrf=ANbL-n4Itz5uG94gksEmInWKFeUZEb4-zA:1774851959055&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOanTb2_xnxYemQeN8JdSkgTtcQb7_Mhl-xQUO85jfdsha-wHMWFKmKkMNBQUh8H5L4L9mYlg_budy0w-Q65eseYSkACd5ZLd6yXEtJX2Al-er6TmWQ%3D%3D&q=Amaravati+Conventions+Reviews&sa=X&ved=2ahUKEwidnLHk_saTAxVhTGwGHVtNGEMQ0bkNegQIJRAH&biw=1920&bih=919&dpr=1"
               target="_blank"
               rel="noopener noreferrer"
-              className="gold-gradient text-maroon px-8 py-3 rounded-full font-bold uppercase tracking-[0.25em] text-xs md:text-sm hover:opacity-90 transition-all whitespace-nowrap"
+              className="gold-gradient text-maroon px-6 md:px-8 py-3 rounded-full font-bold uppercase tracking-[0.14em] md:tracking-[0.25em] text-xs md:text-sm hover:opacity-90 transition-all whitespace-nowrap"
             >
               Read More
             </a>
@@ -542,7 +542,7 @@ export default function App() {
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="h-[450px] rounded-3xl overflow-hidden luxury-shadow border-4 border-white"
+              className="h-[320px] md:h-[450px] rounded-3xl overflow-hidden luxury-shadow border-4 border-white"
             >
               <iframe 
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30602.714261003697!2d80.58602367431642!3d16.508960400000007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a35f00302c5ea47%3A0xd4339665f95e2d8c!2sAmaravati%20Conventions!5e0!3m2!1sen!2sus!4v1774422510261!5m2!1sen!2sus" 
@@ -649,10 +649,10 @@ export default function App() {
       {/* --- Footer --- */}
       <footer className="bg-[#1a1a1a] text-white pt-16 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-14">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-14">
             <div>
-              <div className="flex justify-center mb-2 -mt-4">
-                <div className="w-56 h-56 flex items-center justify-center">
+              <div className="flex justify-center mb-2 -mt-2 md:-mt-4">
+                <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 flex items-center justify-center">
                   <img
                     src="/logo%20accepted.png"
                     alt="Amaravathi Conventions"
@@ -702,22 +702,22 @@ export default function App() {
               <p className="text-white/40 text-sm mb-5 leading-relaxed">
                 Subscribe to get updates on our latest packages and event inspirations.
               </p>
-              <form className="flex" onSubmit={(e) => e.preventDefault()}>
+              <form className="flex flex-col sm:flex-row" onSubmit={(e) => e.preventDefault()}>
                 <input
                   type="email"
                   placeholder="Email Address"
-                  className="flex-1 bg-white/10 border border-white/10 px-4 py-3 rounded-l-lg text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-gold"
+                  className="flex-1 bg-white/10 border border-white/10 px-4 py-3 rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-gold"
                 />
-                <button className="gold-gradient text-maroon px-4 py-3 rounded-r-lg hover:opacity-90 transition-all">
+                <button className="gold-gradient text-maroon px-4 py-3 rounded-b-lg sm:rounded-r-lg sm:rounded-bl-none hover:opacity-90 transition-all">
                   <ArrowRight size={18} />
                 </button>
               </form>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-white/30 text-[11px] uppercase tracking-[0.2em]">
+          <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-white/30 text-[10px] md:text-[11px] uppercase tracking-[0.12em] md:tracking-[0.2em] text-center md:text-left">
             <p>&copy; 2026 Amaravathi Conventions. All Rights Reserved.</p>
-            <div className="flex gap-8">
+            <div className="flex gap-5 md:gap-8">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
             </div>
@@ -726,7 +726,7 @@ export default function App() {
       </footer>
 
       {/* --- Sticky Elements --- */}
-      <div className="fixed bottom-8 left-8 z-50">
+      <div className="fixed bottom-24 md:bottom-8 left-4 md:left-8 z-50">
         <a 
           href="https://wa.me/919000387878" 
           target="_blank" 
@@ -737,7 +737,7 @@ export default function App() {
         </a>
       </div>
 
-      <div className="fixed bottom-8 right-8 z-50 md:hidden">
+      <div className="fixed bottom-6 right-4 z-50 md:hidden">
         <button 
           onClick={() => scrollToSection('#contact')}
           className="gold-gradient text-maroon px-6 py-3 rounded-full font-bold uppercase tracking-widest luxury-shadow"
