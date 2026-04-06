@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import { 
   Users, 
@@ -17,11 +17,19 @@ import {
   Star, 
   ChevronRight,
   AirVent,
-  Music,
-  Utensils,
+  Speaker,
   Car,
-  ShieldCheck,
-  Lightbulb,
+  ChefHat,
+  BedDouble,
+  BatteryCharging,
+  MoveVertical,
+  Accessibility,
+  Cctv,
+  Palette,
+  LampCeiling,
+  Armchair,
+  CookingPot,
+  Droplets,
   ArrowRight,
   ImageOff
 } from 'lucide-react';
@@ -38,6 +46,30 @@ interface Facility {
   name: string;
   icon: React.ReactNode;
 }
+
+/** Line-art dining table (tablecloth, plate, mug) — matches amenity card style; uses currentColor */
+const DiningTableIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden
+  >
+    <path d="M3 7h18a1 1 0 0 1 1 1v1H2V8a1 1 0 0 1 1-1z" />
+    <line x1="5" y1="9" x2="5" y2="20" />
+    <line x1="19" y1="9" x2="19" y2="20" />
+    <line x1="5" y1="15" x2="19" y2="15" />
+    <path d="M10 9h4l-2 4.5z" />
+    <ellipse cx="11" cy="7.5" rx="2" ry="0.85" />
+    <rect x="14.5" y="6" width="3" height="3.5" rx="0.5" />
+    <path d="M17.5 7.5h1.3a1 1 0 0 1 0 2H17.5" />
+  </svg>
+);
 
 // --- Constants ---
 const EVENT_TYPES: EventType[] = [
@@ -85,25 +117,20 @@ const EVENT_TYPES: EventType[] = [
 
 const FACILITIES: Facility[] = [
   { name: 'Air Conditioning', icon: <AirVent className="w-6 h-6" /> },
-  { name: 'Stage & Sound System', icon: <Music className="w-6 h-6" /> },
-  { name: 'In-house Catering', icon: <Utensils className="w-6 h-6" /> },
-  { name: 'External Catering Allowed', icon: <Utensils className="w-6 h-6" /> },
+  { name: 'Stage & Sound System', icon: <Speaker className="w-6 h-6" /> },
+  { name: 'In-house Catering', icon: <ChefHat className="w-6 h-6" /> },
   { name: 'Valet Parking', icon: <Car className="w-6 h-6" /> },
-  { name: 'Ample Parking Space', icon: <Car className="w-6 h-6" /> },
-  { name: 'Bridal Room', icon: <Users className="w-6 h-6" /> },
-  { name: 'Green Room', icon: <Users className="w-6 h-6" /> },
-  { name: 'Generator Backup', icon: <ShieldCheck className="w-6 h-6" /> },
-  { name: 'Lift', icon: <Users className="w-6 h-6" /> },
-  { name: 'Wheelchair Accessibility', icon: <Users className="w-6 h-6" /> },
-  { name: 'CCTV & Security', icon: <ShieldCheck className="w-6 h-6" /> },
-  { name: 'Decoration Services', icon: <Lightbulb className="w-6 h-6" /> },
-  { name: 'Lighting Setup', icon: <Lightbulb className="w-6 h-6" /> },
-  { name: 'Chairs', icon: <ShieldCheck className="w-6 h-6" /> },
-  { name: 'Chair Covers', icon: <ShieldCheck className="w-6 h-6" /> },
-  { name: 'Dining Tables', icon: <ShieldCheck className="w-6 h-6" /> },
-  { name: 'Kitchen', icon: <ShieldCheck className="w-6 h-6" /> },
-  { name: 'Utensils', icon: <ShieldCheck className="w-6 h-6" /> },
-  { name: 'RO Water Plant', icon: <ShieldCheck className="w-6 h-6" /> },
+  { name: 'Green Room', icon: <BedDouble className="w-6 h-6" /> },
+  { name: 'Generator Backup', icon: <BatteryCharging className="w-6 h-6" /> },
+  { name: 'Lift', icon: <MoveVertical className="w-6 h-6" /> },
+  { name: 'Wheelchair Accessibility', icon: <Accessibility className="w-6 h-6" /> },
+  { name: 'CCTV & Security', icon: <Cctv className="w-6 h-6" /> },
+  { name: 'Decoration Services', icon: <Palette className="w-6 h-6" /> },
+  { name: 'Lighting Setup', icon: <LampCeiling className="w-6 h-6" /> },
+  { name: 'Chairs', icon: <Armchair className="w-6 h-6" /> },
+  { name: 'Dining Tables', icon: <DiningTableIcon className="w-6 h-6" /> },
+  { name: 'Kitchen & Utensils', icon: <CookingPot className="w-6 h-6" /> },
+  { name: 'RO Water Plant', icon: <Droplets className="w-6 h-6" /> },
 ];
 
 const API = import.meta.env.VITE_API_URL || '';
@@ -156,6 +183,7 @@ const GalleryImage = ({ src, alt, index }: { src: string; alt: string; index: nu
 
 export default function App() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [galleryImages, setGalleryImages] = useState<string[]>(DEFAULT_GALLERY_IMAGES);
   const [formData, setFormData] = useState({ name: '', phone: '', eventType: 'Wedding', eventDate: '', message: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -173,6 +201,21 @@ export default function App() {
   }, []);
 
   useEffect(() => { fetchGallery(); }, [fetchGallery]);
+
+  useEffect(() => {
+    if (!location.hash) return;
+    const id = location.hash.slice(1);
+    const scrollToHash = () => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const nav = document.querySelector('nav');
+      const navH = nav?.getBoundingClientRect().height ?? 88;
+      const top = el.getBoundingClientRect().top + window.scrollY - navH - 12;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    };
+    const t = window.setTimeout(scrollToHash, 50);
+    return () => clearTimeout(t);
+  }, [location.pathname, location.hash]);
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,7 +243,10 @@ export default function App() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id.replace('#', ''));
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const nav = document.querySelector('nav');
+      const navH = nav?.getBoundingClientRect().height ?? 88;
+      const top = element.getBoundingClientRect().top + window.scrollY - navH - 12;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
     }
   };
 
@@ -209,7 +255,7 @@ export default function App() {
       <Navbar transparent={false} />
 
       {/* --- Hero Section --- */}
-      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-12">
+      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-8">
         <div className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=1920" 
@@ -247,7 +293,7 @@ export default function App() {
               onClick={() => scrollToSection('#contact')}
               className="w-full sm:w-auto gold-gradient text-maroon px-8 md:px-10 py-4 rounded-full font-bold uppercase tracking-[0.14em] md:tracking-widest hover:opacity-90 transition-all luxury-shadow"
             >
-              Enquiry Now
+              Enquire now
             </button>
             <a 
               href="https://wa.me/919000387878" 
@@ -265,14 +311,14 @@ export default function App() {
       </section>
 
       {/* --- Highlights Section --- */}
-      <section className="py-12 bg-white">
+      <section className="py-5 md:py-6 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {[
-              { icon: <Users className="text-gold w-8 h-8" />, label: '400 Seating', sub: '700 Standing Capacity' },
-              { icon: <Maximize className="text-gold w-8 h-8" />, label: '8000 + 5000 sq ft', sub: 'Hall + Canopy Space' },
-              { icon: <MapPin className="text-gold w-8 h-8" />, label: 'Prime Main Road', sub: '1 km from Bus & Rail' },
-              { icon: <Calendar className="text-gold w-8 h-8" />, label: 'All Event Types', sub: 'Fixed & Custom Packages' },
+              { icon: <Users className="text-gold w-7 h-7 md:w-8 md:h-8" />, label: '400 Seating', sub: '700 Standing Capacity' },
+              { icon: <Maximize className="text-gold w-7 h-7 md:w-8 md:h-8" />, label: '8000 + 5000 sq ft', sub: 'Hall + Canopy Space' },
+              { icon: <MapPin className="text-gold w-7 h-7 md:w-8 md:h-8" />, label: 'Prime Main Road', sub: '1 km from Bus & Rail' },
+              { icon: <Calendar className="text-gold w-7 h-7 md:w-8 md:h-8" />, label: 'All Event Types', sub: 'Fixed & Custom Packages' },
             ].map((stat, i) => (
               <motion.div 
                 key={i}
@@ -280,11 +326,11 @@ export default function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="text-center p-6 rounded-2xl hover:bg-ivory transition-colors"
+                className="text-center py-3 px-2 md:py-4 md:px-3 rounded-xl hover:bg-ivory transition-colors"
               >
-                <div className="flex justify-center mb-4">{stat.icon}</div>
-                <h3 className="text-xl font-serif text-maroon mb-1">{stat.label}</h3>
-                <p className="text-sm text-charcoal/60 uppercase tracking-widest">{stat.sub}</p>
+                <div className="flex justify-center mb-2">{stat.icon}</div>
+                <h3 className="text-base md:text-lg font-serif text-maroon mb-0.5 leading-snug">{stat.label}</h3>
+                <p className="text-[11px] md:text-xs text-charcoal/60 uppercase tracking-widest leading-tight">{stat.sub}</p>
               </motion.div>
             ))}
           </div>
@@ -292,7 +338,7 @@ export default function App() {
       </section>
 
       {/* --- About Section --- */}
-      <section id="about" className="py-24 bg-ivory overflow-hidden">
+      <section id="about" className="py-16 bg-ivory overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -351,7 +397,7 @@ export default function App() {
       </section>
 
       {/* --- Events Section --- */}
-      <section id="events" className="py-24 bg-white">
+      <section id="events" className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <p className="text-gold font-sans font-semibold tracking-widest uppercase mb-4">Our Expertise</p>
@@ -388,43 +434,63 @@ export default function App() {
       </section>
 
       {/* --- Facilities Section --- */}
-      <section id="facilities" className="py-24 bg-maroon text-white">
+      <section id="facilities" className="py-16 bg-maroon text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-3 gap-16 items-center">
-            <div className="lg:col-span-1">
-              <p className="text-gold font-sans font-semibold tracking-widest uppercase mb-4">World-Class Amenities</p>
-              <h2 className="text-4xl md:text-5xl font-serif mb-8 leading-tight">Premium Facilities for Your Guests</h2>
-              <p className="text-white/70 mb-8">
-                We provide every essential facility to ensure your event runs smoothly and your guests stay comfortable throughout the celebration.
+          <div className="flex flex-col lg:flex-row lg:items-start gap-12 lg:gap-14 xl:gap-16">
+            <div className="w-full lg:max-w-md lg:flex-shrink-0">
+              <p className="text-gold font-sans font-semibold tracking-[0.28em] uppercase text-xs mb-4">
+                World-Class Amenities
               </p>
-              <button 
-                onClick={() => scrollToSection('#contact')}
-                className="gold-gradient text-maroon px-8 py-3 rounded-full font-bold uppercase tracking-widest hover:opacity-90 transition-all"
-              >
-                View All Facilities
-              </button>
+              <h2 className="text-3xl sm:text-4xl md:text-[2.75rem] font-serif text-white mb-6 leading-tight">
+                Premium Facilities for Your Guests
+              </h2>
+              <p className="text-white/80 font-sans text-sm md:text-base leading-relaxed mb-8">
+                We provide every essential facility so your event runs smoothly and your guests stay comfortable from arrival to farewell.
+              </p>
+              <ul className="space-y-4 text-sm text-white/85 font-sans leading-snug">
+                {[
+                  { k: 'A', text: 'Comfort and ambience — AC halls, lighting, décor, and stage & sound for a polished experience.' },
+                  { k: 'B', text: 'Guest convenience — valet parking, lift access, wheelchair-friendly spaces, and attentive security.' },
+                  { k: 'C', text: 'Back-of-house support — generator backup, RO water, kitchen & catering infrastructure.' },
+                ].map((row) => (
+                  <li key={row.k} className="flex gap-3">
+                    <span
+                      className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/35 text-[11px] font-semibold tracking-wider text-gold"
+                      aria-hidden
+                    >
+                      {row.k}
+                    </span>
+                    <span>{row.text}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="lg:col-span-2 grid sm:grid-cols-2 gap-6">
-              {FACILITIES.map((facility, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05 }}
-                  className="flex items-center gap-4 p-6 bg-white/5 rounded-2xl border border-white/10 hover:bg-white/10 transition-colors"
-                >
-                  <div className="text-gold">{facility.icon}</div>
-                  <span className="font-medium tracking-wide">{facility.name}</span>
-                </motion.div>
-              ))}
+
+            <div className="min-w-0 flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                {FACILITIES.map((facility, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.03 }}
+                    className="flex items-center gap-3 rounded-xl bg-white/[0.08] px-3.5 py-3 sm:px-4 sm:py-3.5 border border-white/10 hover:bg-white/[0.12] hover:border-white/15 transition-colors"
+                  >
+                    <div className="text-gold shrink-0 [&_svg]:w-5 [&_svg]:h-5 sm:[&_svg]:w-6 sm:[&_svg]:h-6">
+                      {facility.icon}
+                    </div>
+                    <span className="font-sans text-sm text-white leading-tight">{facility.name}</span>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* --- Gallery Section --- */}
-      <section id="gallery" className="py-24 bg-ivory">
+      <section id="gallery" className="py-16 bg-ivory">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div>
@@ -452,7 +518,7 @@ export default function App() {
       </section>
 
       {/* --- Testimonials --- */}
-      <section className="py-24 bg-white">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-4 mb-16">
             <div className="text-center md:text-left">
@@ -505,7 +571,7 @@ export default function App() {
       </section>
 
       {/* --- Location Section --- */}
-      <section className="py-24 bg-ivory">
+      <section className="py-16 bg-ivory">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -559,7 +625,7 @@ export default function App() {
       </section>
 
       {/* --- Final CTA Section --- */}
-      <section id="contact" className="py-24 bg-maroon relative overflow-hidden">
+      <section id="contact" className="py-16 bg-maroon relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-gold rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-gold rounded-full blur-[100px] translate-x-1/2 translate-y-1/2"></div>
@@ -647,25 +713,26 @@ export default function App() {
       </section>
 
       {/* --- Footer --- */}
-      <footer className="bg-[#1a1a1a] text-white pt-16 pb-8">
+      <footer className="bg-[#1a1a1a] text-white pt-12 pb-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-14">
-            <div>
-              <div className="flex justify-center mb-2 -mt-2 md:-mt-4">
-                <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 flex items-center justify-center">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-14 items-start">
+            <div className="flex min-h-0 flex-col items-start text-left">
+              {/* mb-6 matches h4 mb-6 in link columns */}
+              <div className="mb-2 flex w-full justify-start">
+                <div className="flex h-32 w-40 shrink-0 items-start justify-start sm:h-48 sm:w-48 md:h-56 md:w-56">
                   <img
                     src="/logo%20accepted.png"
                     alt="Amaravathi Conventions"
-                    className="w-full h-full object-contain"
+                    className="max-h-full w-full max-w-full object-contain object-left object-top"
                   />
                 </div>
               </div>
-              <p className="text-white/40 text-sm leading-relaxed">
+              <p className="-mt-3 text-white/40 text-sm leading-relaxed sm:-mt-4">
                 Vijayawada's premier destination for luxury weddings, corporate events, and grand celebrations. Experience world-class hospitality in the heart of the city.
               </p>
             </div>
 
-            <div>
+            <div className="pt-6 sm:pt-7 lg:pt-9">
               <h4 className="font-serif text-lg mb-6">Quick Links</h4>
               <ul className="space-y-3 text-white/50 text-sm">
                 {[
@@ -684,7 +751,7 @@ export default function App() {
               </ul>
             </div>
 
-            <div>
+            <div className="pt-6 sm:pt-7 lg:pt-9">
               <h4 className="font-serif text-lg mb-6">Event Types</h4>
               <ul className="space-y-3 text-white/50 text-sm">
                 {['Weddings & Receptions', 'Corporate Conferences', 'Product Launches', 'Exhibitions', 'Private Celebrations'].map(item => (
@@ -697,7 +764,7 @@ export default function App() {
               </ul>
             </div>
 
-            <div>
+            <div className="pt-6 sm:pt-7 lg:pt-9">
               <h4 className="font-serif text-lg mb-6">Newsletter</h4>
               <p className="text-white/40 text-sm mb-5 leading-relaxed">
                 Subscribe to get updates on our latest packages and event inspirations.

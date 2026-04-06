@@ -85,7 +85,7 @@ export default function GalleryPage() {
 
       <div className="flex-1 flex flex-col">
       {/* Hero */}
-      <section className="pt-28 pb-16 text-center">
+      <section className="pt-24 pb-12 text-center">
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -112,7 +112,7 @@ export default function GalleryPage() {
       </section>
 
       {/* Gallery Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 space-y-5">
           {images.map((img, i) => (
             <motion.div
@@ -127,7 +127,7 @@ export default function GalleryPage() {
         </div>
 
         {images.length === 0 && (
-          <div className="text-center py-20 text-charcoal/30">
+          <div className="text-center py-12 text-charcoal/30">
             <ImageOff size={48} className="mx-auto mb-4 opacity-30" />
             <p className="font-serif text-lg">No images yet</p>
           </div>
@@ -186,7 +186,7 @@ export default function GalleryPage() {
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="mt-auto shrink-0 bg-[#1a1a1a] py-8 text-center">
+      <footer className="mt-auto shrink-0 bg-[#1a1a1a] py-6 text-center">
         <p className="text-white/30 text-[11px] uppercase tracking-[0.2em]">
           &copy; 2026 Amaravathi Conventions. All Rights Reserved.
         </p>

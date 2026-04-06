@@ -11,6 +11,11 @@
 }
 
 @layer base {
+  /* Fixed navbar — keep section headings visible when using in-page anchors / hash URLs */
+  html {
+    scroll-padding-top: 6.5rem;
+  }
+
   body {
     @apply bg-ivory text-charcoal font-sans;
   }

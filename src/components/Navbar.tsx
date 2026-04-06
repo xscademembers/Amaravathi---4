@@ -32,8 +32,14 @@ export default function Navbar({ transparent = true }: NavbarProps) {
   const handleNav = (href: string) => {
     setIsMenuOpen(false);
     if (isHome) {
-      const el = document.getElementById(href.replace('#', ''));
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      const id = href.replace('#', '');
+      const el = document.getElementById(id);
+      if (el) {
+        const nav = document.querySelector('nav');
+        const navH = nav?.getBoundingClientRect().height ?? 88;
+        const top = el.getBoundingClientRect().top + window.scrollY - navH - 12;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      }
     } else {
       navigate('/' + href);
     }
@@ -55,7 +61,7 @@ export default function Navbar({ transparent = true }: NavbarProps) {
             <img
               src="/1.png"
               alt="Amaravathi Conventions"
-              className="h-30 w-52 object-contain"
+              className="h-20 w-52 object-contain"
             />
           </div>
 
@@ -74,7 +80,7 @@ export default function Navbar({ transparent = true }: NavbarProps) {
               onClick={() => handleNav('#contact')}
               className="gold-gradient text-maroon px-6 py-1 rounded-full text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-all luxury-shadow"
             >
-              Enquiry Now
+              Enquire now
             </button>
           </div>
 
@@ -110,7 +116,7 @@ export default function Navbar({ transparent = true }: NavbarProps) {
                 onClick={() => handleNav('#contact')}
                 className="gold-gradient text-maroon w-full py-4 rounded-xl text-lg font-bold uppercase tracking-widest"
               >
-                Enquiry Now
+                Enquire now
               </button>
             </div>
           </motion.div>
