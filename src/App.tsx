@@ -15,6 +15,7 @@ import {
   MessageCircle, 
   Calendar, 
   Star, 
+  ChevronLeft,
   ChevronRight,
   AirVent,
   Speaker,
@@ -185,8 +186,11 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [galleryImages, setGalleryImages] = useState<string[]>(DEFAULT_GALLERY_IMAGES);
+  const [mobileGalleryIndex, setMobileGalleryIndex] = useState(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [formData, setFormData] = useState({ name: '', phone: '', eventType: 'Wedding', eventDate: '', message: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const mobileGalleryImages = galleryImages.slice(0, 10);
 
   const fetchGallery = useCallback(async () => {
     try {
@@ -201,6 +205,9 @@ export default function App() {
   }, []);
 
   useEffect(() => { fetchGallery(); }, [fetchGallery]);
+  useEffect(() => {
+    setMobileGalleryIndex((prev) => (mobileGalleryImages.length ? Math.min(prev, mobileGalleryImages.length - 1) : 0));
+  }, [mobileGalleryImages.length]);
 
   useEffect(() => {
     if (!location.hash) return;
@@ -250,12 +257,22 @@ export default function App() {
     }
   };
 
+  const goToPrevGallerySlide = () => {
+    if (!mobileGalleryImages.length) return;
+    setMobileGalleryIndex((prev) => (prev - 1 + mobileGalleryImages.length) % mobileGalleryImages.length);
+  };
+
+  const goToNextGallerySlide = () => {
+    if (!mobileGalleryImages.length) return;
+    setMobileGalleryIndex((prev) => (prev + 1) % mobileGalleryImages.length);
+  };
+
   return (
     <div className="min-h-screen">
       <Navbar transparent={false} />
 
       {/* --- Hero Section --- */}
-      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-8">
+      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-4 sm:pt-8">
         <div className="absolute inset-0 z-0">
           <img 
             src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=1920" 
@@ -311,7 +328,7 @@ export default function App() {
       </section>
 
       {/* --- Highlights Section --- */}
-      <section className="py-5 md:py-6 bg-white">
+      <section className="py-3 md:py-6 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {[
@@ -338,7 +355,7 @@ export default function App() {
       </section>
 
       {/* --- About Section --- */}
-      <section id="about" className="py-16 bg-ivory overflow-hidden">
+      <section id="about" className="py-[30px] sm:py-16 bg-ivory overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -347,7 +364,7 @@ export default function App() {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="aspect-[4/5] rounded-3xl overflow-hidden luxury-shadow">
+              <div className="aspect-[4/5] w-[88%] sm:w-full mx-auto rounded-3xl overflow-hidden luxury-shadow">
                 <img 
                   src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800" 
                   alt="Venue Interior" 
@@ -397,14 +414,43 @@ export default function App() {
       </section>
 
       {/* --- Events Section --- */}
-      <section id="events" className="py-16 bg-white">
+      <section id="events" className="py-[30px] sm:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <p className="text-gold font-sans font-semibold tracking-widest uppercase mb-4">Our Expertise</p>
             <h2 className="text-4xl md:text-5xl font-serif text-maroon">Events We Host</h2>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="md:hidden -mx-4 px-4">
+            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2">
+              {EVENT_TYPES.map((event, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  className="group relative h-[360px] w-[82%] shrink-0 snap-center rounded-3xl overflow-hidden luxury-shadow cursor-pointer"
+                >
+                  <img
+                    src={event.image}
+                    alt={event.title}
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-maroon via-maroon/20 to-transparent opacity-85"></div>
+                  <div className="absolute bottom-0 left-0 p-6 text-white">
+                    <h3 className="text-2xl font-serif mb-2">{event.title}</h3>
+                    <p className="text-sm opacity-95 line-clamp-3">
+                      {event.description}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {EVENT_TYPES.map((event, i) => (
               <motion.div
                 key={i}
@@ -434,7 +480,7 @@ export default function App() {
       </section>
 
       {/* --- Facilities Section --- */}
-      <section id="facilities" className="py-16 bg-maroon text-white">
+      <section id="facilities" className="py-[30px] sm:py-16 bg-maroon text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row lg:items-start gap-12 lg:gap-14 xl:gap-16">
             <div className="w-full lg:max-w-md lg:flex-shrink-0">
@@ -458,8 +504,8 @@ export default function App() {
               </ul>
             </div>
 
-            <div className="min-w-0 flex-1">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <div className="min-w-0 flex-1 lg:pt-12">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {FACILITIES.map((facility, i) => (
                   <motion.div
                     key={i}
@@ -482,10 +528,10 @@ export default function App() {
       </section>
 
       {/* --- Gallery Section --- */}
-      <section id="gallery" className="py-16 bg-ivory">
+      <section id="gallery" className="py-[30px] sm:py-16 bg-ivory">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div>
+          <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-6">
+            <div className="text-center md:text-left">
               <p className="text-gold font-sans font-semibold tracking-widest uppercase mb-4">Visual Journey</p>
               <h2 className="text-4xl md:text-5xl font-serif text-maroon">Our Gallery</h2>
             </div>
@@ -494,7 +540,56 @@ export default function App() {
             </button>
           </div>
 
-          <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+          <div className="md:hidden">
+            <motion.div
+              key={mobileGalleryImages[mobileGalleryIndex] ?? 'mobile-gallery-fallback'}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.25 }}
+              onTouchStart={(e) => setTouchStartX(e.changedTouches[0].clientX)}
+              onTouchEnd={(e) => {
+                if (touchStartX === null) return;
+                const deltaX = e.changedTouches[0].clientX - touchStartX;
+                if (Math.abs(deltaX) > 40) {
+                  if (deltaX > 0) goToPrevGallerySlide();
+                  else goToNextGallerySlide();
+                }
+                setTouchStartX(null);
+              }}
+            >
+              {mobileGalleryImages.length > 0 && (
+                <GalleryImage
+                  src={mobileGalleryImages[mobileGalleryIndex]}
+                  alt={`Gallery ${mobileGalleryIndex + 1}`}
+                  index={mobileGalleryIndex}
+                />
+              )}
+            </motion.div>
+
+            <div className="mt-4 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={goToPrevGallerySlide}
+                className="h-10 w-10 rounded-full border border-maroon/20 text-maroon hover:bg-maroon/5 transition-colors flex items-center justify-center"
+                aria-label="Previous gallery image"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <span className="text-xs font-semibold tracking-[0.12em] uppercase text-maroon/70">
+                {mobileGalleryIndex + 1} / {mobileGalleryImages.length}
+              </span>
+              <button
+                type="button"
+                onClick={goToNextGallerySlide}
+                className="h-10 w-10 rounded-full border border-maroon/20 text-maroon hover:bg-maroon/5 transition-colors flex items-center justify-center"
+                aria-label="Next gallery image"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+
+          <div className="hidden md:block md:columns-2 lg:columns-3 gap-6 space-y-6">
             {galleryImages.slice(0, 10).map((img, i) => (
               <motion.div
                 key={i}
@@ -510,7 +605,7 @@ export default function App() {
       </section>
 
       {/* --- Testimonials --- */}
-      <section className="py-16 bg-white">
+      <section className="py-[30px] sm:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-4 mb-16">
             <div className="text-center md:text-left">
@@ -563,7 +658,7 @@ export default function App() {
       </section>
 
       {/* --- Location Section --- */}
-      <section className="py-16 bg-ivory">
+      <section className="py-[30px] sm:py-16 bg-ivory">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -617,7 +712,7 @@ export default function App() {
       </section>
 
       {/* --- Final CTA Section --- */}
-      <section id="contact" className="py-16 bg-maroon relative overflow-hidden">
+      <section id="contact" className="py-[30px] sm:py-16 bg-maroon relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-gold rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-gold rounded-full blur-[100px] translate-x-1/2 translate-y-1/2"></div>
@@ -707,20 +802,20 @@ export default function App() {
       {/* --- Footer --- */}
       <footer className="bg-[#1a1a1a] text-white pt-6 pb-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-10 items-start">
-            <div className="flex min-h-0 flex-col items-start text-left">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-10 items-start">
+            <div className="col-span-2 lg:col-span-1 flex min-h-0 flex-col items-center lg:items-start text-center lg:text-left">
               <div className="pt-1 sm:pt-2 lg:pt-3">
-                <div className="mb-0 flex w-full justify-start">
-                  <div className="flex h-32 w-40 shrink-0 items-start justify-start sm:h-48 sm:w-48 md:h-56 md:w-56">
+                <div className="mb-0 flex w-full justify-center lg:justify-start">
+                  <div className="flex h-32 w-40 shrink-0 items-start justify-center lg:justify-start sm:h-48 sm:w-48 md:h-56 md:w-56">
                     <img
                       src="/logo%20accepted.png"
                       alt="Amaravathi Conventions"
-                      className="max-h-full w-full max-w-full object-contain object-left object-top"
+                      className="max-h-full w-full max-w-full object-contain object-center lg:object-left object-top"
                     />
                   </div>
                 </div>
               </div>
-              <p className="-mt-5 text-white/40 text-sm leading-relaxed sm:-mt-6">
+              <p className="mt-2 text-white/40 text-sm leading-relaxed">
                 Vijayawada's premier destination for luxury weddings, corporate events, and grand celebrations. Experience world-class hospitality in the heart of the city.
               </p>
             </div>
@@ -757,7 +852,7 @@ export default function App() {
               </ul>
             </div>
 
-            <div className="pt-3 sm:pt-4 lg:pt-5">
+            <div className="col-span-2 lg:col-span-1 pt-3 sm:pt-4 lg:pt-5">
               <h4 className="font-serif text-lg mb-6">Newsletter</h4>
               <p className="text-white/40 text-sm mb-5 leading-relaxed">
                 Subscribe to get updates on our latest packages and event inspirations.
