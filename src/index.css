@@ -11,9 +11,9 @@
 }
 
 @layer base {
-  /* Fixed navbar — keep section headings visible when using in-page anchors / hash URLs */
+  /* Fixed navbar — hash links; keep in sync with nav height used in JS */
   html {
-    scroll-padding-top: 6.5rem;
+    scroll-padding-top: 5.5rem;
   }
 
   body {

@@ -210,7 +210,7 @@ export default function App() {
       if (!el) return;
       const nav = document.querySelector('nav');
       const navH = nav?.getBoundingClientRect().height ?? 88;
-      const top = el.getBoundingClientRect().top + window.scrollY - navH - 12;
+      const top = el.getBoundingClientRect().top + window.scrollY - navH;
       window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
     };
     const t = window.setTimeout(scrollToHash, 50);
@@ -245,7 +245,7 @@ export default function App() {
     if (element) {
       const nav = document.querySelector('nav');
       const navH = nav?.getBoundingClientRect().height ?? 88;
-      const top = element.getBoundingClientRect().top + window.scrollY - navH - 12;
+      const top = element.getBoundingClientRect().top + window.scrollY - navH;
       window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
     }
   };
@@ -447,21 +447,13 @@ export default function App() {
               <p className="text-white/80 font-sans text-sm md:text-base leading-relaxed mb-8">
                 We provide every essential facility so your event runs smoothly and your guests stay comfortable from arrival to farewell.
               </p>
-              <ul className="space-y-4 text-sm text-white/85 font-sans leading-snug">
+              <ul className="list-disc pl-5 space-y-4 text-sm text-white/85 font-sans leading-snug marker:text-gold marker:text-base">
                 {[
-                  { k: 'A', text: 'Comfort and ambience — AC halls, lighting, décor, and stage & sound for a polished experience.' },
-                  { k: 'B', text: 'Guest convenience — valet parking, lift access, wheelchair-friendly spaces, and attentive security.' },
-                  { k: 'C', text: 'Back-of-house support — generator backup, RO water, kitchen & catering infrastructure.' },
-                ].map((row) => (
-                  <li key={row.k} className="flex gap-3">
-                    <span
-                      className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/35 text-[11px] font-semibold tracking-wider text-gold"
-                      aria-hidden
-                    >
-                      {row.k}
-                    </span>
-                    <span>{row.text}</span>
-                  </li>
+                  'Comfort and ambience — AC halls, lighting, décor, and stage & sound for a polished experience.',
+                  'Guest convenience — valet parking, lift access, wheelchair-friendly spaces, and attentive security.',
+                  'Back-of-house support — generator backup, RO water, kitchen & catering infrastructure.',
+                ].map((text) => (
+                  <li key={text}>{text}</li>
                 ))}
               </ul>
             </div>
@@ -713,26 +705,27 @@ export default function App() {
       </section>
 
       {/* --- Footer --- */}
-      <footer className="bg-[#1a1a1a] text-white pt-12 pb-6">
+      <footer className="bg-[#1a1a1a] text-white pt-6 pb-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-14 items-start">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-10 items-start">
             <div className="flex min-h-0 flex-col items-start text-left">
-              {/* mb-6 matches h4 mb-6 in link columns */}
-              <div className="mb-2 flex w-full justify-start">
-                <div className="flex h-32 w-40 shrink-0 items-start justify-start sm:h-48 sm:w-48 md:h-56 md:w-56">
-                  <img
-                    src="/logo%20accepted.png"
-                    alt="Amaravathi Conventions"
-                    className="max-h-full w-full max-w-full object-contain object-left object-top"
-                  />
+              <div className="pt-1 sm:pt-2 lg:pt-3">
+                <div className="mb-0 flex w-full justify-start">
+                  <div className="flex h-32 w-40 shrink-0 items-start justify-start sm:h-48 sm:w-48 md:h-56 md:w-56">
+                    <img
+                      src="/logo%20accepted.png"
+                      alt="Amaravathi Conventions"
+                      className="max-h-full w-full max-w-full object-contain object-left object-top"
+                    />
+                  </div>
                 </div>
               </div>
-              <p className="-mt-3 text-white/40 text-sm leading-relaxed sm:-mt-4">
+              <p className="-mt-5 text-white/40 text-sm leading-relaxed sm:-mt-6">
                 Vijayawada's premier destination for luxury weddings, corporate events, and grand celebrations. Experience world-class hospitality in the heart of the city.
               </p>
             </div>
 
-            <div className="pt-6 sm:pt-7 lg:pt-9">
+            <div className="pt-3 sm:pt-4 lg:pt-5">
               <h4 className="font-serif text-lg mb-6">Quick Links</h4>
               <ul className="space-y-3 text-white/50 text-sm">
                 {[
@@ -751,7 +744,7 @@ export default function App() {
               </ul>
             </div>
 
-            <div className="pt-6 sm:pt-7 lg:pt-9">
+            <div className="pt-3 sm:pt-4 lg:pt-5">
               <h4 className="font-serif text-lg mb-6">Event Types</h4>
               <ul className="space-y-3 text-white/50 text-sm">
                 {['Weddings & Receptions', 'Corporate Conferences', 'Product Launches', 'Exhibitions', 'Private Celebrations'].map(item => (
@@ -764,7 +757,7 @@ export default function App() {
               </ul>
             </div>
 
-            <div className="pt-6 sm:pt-7 lg:pt-9">
+            <div className="pt-3 sm:pt-4 lg:pt-5">
               <h4 className="font-serif text-lg mb-6">Newsletter</h4>
               <p className="text-white/40 text-sm mb-5 leading-relaxed">
                 Subscribe to get updates on our latest packages and event inspirations.
@@ -782,7 +775,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-white/30 text-[10px] md:text-[11px] uppercase tracking-[0.12em] md:tracking-[0.2em] text-center md:text-left">
+          <div className="pt-4 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-white/30 text-[10px] md:text-[11px] uppercase tracking-[0.12em] md:tracking-[0.2em] text-center md:text-left">
             <p>&copy; 2026 Amaravathi Conventions. All Rights Reserved.</p>
             <div className="flex gap-5 md:gap-8">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>

@@ -37,7 +37,7 @@ export default function Navbar({ transparent = true }: NavbarProps) {
       if (el) {
         const nav = document.querySelector('nav');
         const navH = nav?.getBoundingClientRect().height ?? 88;
-        const top = el.getBoundingClientRect().top + window.scrollY - navH - 12;
+        const top = el.getBoundingClientRect().top + window.scrollY - navH;
         window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
       }
     } else {
