@@ -186,10 +186,14 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [galleryImages, setGalleryImages] = useState<string[]>(DEFAULT_GALLERY_IMAGES);
+  const [mobileEventIndex, setMobileEventIndex] = useState(0);
+  const [eventTouchStartX, setEventTouchStartX] = useState<number | null>(null);
   const [mobileGalleryIndex, setMobileGalleryIndex] = useState(0);
+  const [isMobileGalleryPaused, setIsMobileGalleryPaused] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [formData, setFormData] = useState({ name: '', phone: '', eventType: 'Wedding', eventDate: '', message: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const mobileEventSlides = EVENT_TYPES;
   const mobileGalleryImages = galleryImages.slice(0, 10);
 
   const fetchGallery = useCallback(async () => {
@@ -208,6 +212,13 @@ export default function App() {
   useEffect(() => {
     setMobileGalleryIndex((prev) => (mobileGalleryImages.length ? Math.min(prev, mobileGalleryImages.length - 1) : 0));
   }, [mobileGalleryImages.length]);
+  useEffect(() => {
+    if (mobileGalleryImages.length <= 1 || isMobileGalleryPaused) return;
+    const timer = window.setInterval(() => {
+      setMobileGalleryIndex((prev) => (prev + 1) % mobileGalleryImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [mobileGalleryImages.length, isMobileGalleryPaused]);
 
   useEffect(() => {
     if (!location.hash) return;
@@ -265,6 +276,16 @@ export default function App() {
   const goToNextGallerySlide = () => {
     if (!mobileGalleryImages.length) return;
     setMobileGalleryIndex((prev) => (prev + 1) % mobileGalleryImages.length);
+  };
+
+  const goToPrevEventSlide = () => {
+    if (!mobileEventSlides.length) return;
+    setMobileEventIndex((prev) => (prev - 1 + mobileEventSlides.length) % mobileEventSlides.length);
+  };
+
+  const goToNextEventSlide = () => {
+    if (!mobileEventSlides.length) return;
+    setMobileEventIndex((prev) => (prev + 1) % mobileEventSlides.length);
   };
 
   return (
@@ -421,32 +442,63 @@ export default function App() {
             <h2 className="text-4xl md:text-5xl font-serif text-maroon">Events We Host</h2>
           </div>
 
-          <div className="md:hidden -mx-4 px-4">
-            <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2">
-              {EVENT_TYPES.map((event, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05 }}
-                  className="group relative h-[360px] w-[82%] shrink-0 snap-center rounded-3xl overflow-hidden luxury-shadow cursor-pointer"
-                >
+          <div className="md:hidden">
+            <motion.div
+              key={mobileEventSlides[mobileEventIndex]?.title ?? 'mobile-events-fallback'}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.25 }}
+              onTouchStart={(e) => setEventTouchStartX(e.changedTouches[0].clientX)}
+              onTouchEnd={(e) => {
+                if (eventTouchStartX === null) return;
+                const deltaX = e.changedTouches[0].clientX - eventTouchStartX;
+                if (Math.abs(deltaX) > 40) {
+                  if (deltaX > 0) goToPrevEventSlide();
+                  else goToNextEventSlide();
+                }
+                setEventTouchStartX(null);
+              }}
+              className="group relative h-[360px] rounded-3xl overflow-hidden luxury-shadow cursor-pointer"
+            >
+              {mobileEventSlides.length > 0 && (
+                <>
                   <img
-                    src={event.image}
-                    alt={event.title}
+                    src={mobileEventSlides[mobileEventIndex].image}
+                    alt={mobileEventSlides[mobileEventIndex].title}
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-maroon via-maroon/20 to-transparent opacity-85"></div>
                   <div className="absolute bottom-0 left-0 p-6 text-white">
-                    <h3 className="text-2xl font-serif mb-2">{event.title}</h3>
+                    <h3 className="text-2xl font-serif mb-2">{mobileEventSlides[mobileEventIndex].title}</h3>
                     <p className="text-sm opacity-95 line-clamp-3">
-                      {event.description}
+                      {mobileEventSlides[mobileEventIndex].description}
                     </p>
                   </div>
-                </motion.div>
-              ))}
+                </>
+              )}
+            </motion.div>
+
+            <div className="mt-4 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={goToPrevEventSlide}
+                className="h-10 w-10 rounded-full border border-maroon/20 text-maroon hover:bg-maroon/5 transition-colors flex items-center justify-center"
+                aria-label="Previous event image"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <span className="text-xs font-semibold tracking-[0.12em] uppercase text-maroon/70">
+                {mobileEventIndex + 1} / {mobileEventSlides.length}
+              </span>
+              <button
+                type="button"
+                onClick={goToNextEventSlide}
+                className="h-10 w-10 rounded-full border border-maroon/20 text-maroon hover:bg-maroon/5 transition-colors flex items-center justify-center"
+                aria-label="Next event image"
+              >
+                <ChevronRight size={18} />
+              </button>
             </div>
           </div>
 
@@ -513,7 +565,7 @@ export default function App() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.03 }}
-                    className="flex items-center gap-3 rounded-xl bg-white/[0.08] px-3.5 py-3 sm:px-4 sm:py-3.5 border border-white/10 hover:bg-white/[0.12] hover:border-white/15 transition-colors"
+                    className="flex h-[76px] md:h-auto items-center gap-3 rounded-xl bg-white/[0.08] px-3.5 py-3 sm:px-4 sm:py-3.5 md:min-h-[70px] border border-white/10 hover:bg-white/[0.12] hover:border-white/15 transition-colors"
                   >
                     <div className="text-gold shrink-0 [&_svg]:w-5 [&_svg]:h-5 sm:[&_svg]:w-6 sm:[&_svg]:h-6">
                       {facility.icon}
@@ -530,14 +582,11 @@ export default function App() {
       {/* --- Gallery Section --- */}
       <section id="gallery" className="py-[30px] sm:py-16 bg-ivory">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 gap-6">
+          <div className="text-center md:text-left mb-16">
             <div className="text-center md:text-left">
               <p className="text-gold font-sans font-semibold tracking-widest uppercase mb-4">Visual Journey</p>
               <h2 className="text-4xl md:text-5xl font-serif text-maroon">Our Gallery</h2>
             </div>
-            <button onClick={() => navigate('/gallery')} className="gold-gradient text-maroon px-8 md:px-12 py-3.5 md:py-4 rounded-full font-bold uppercase tracking-[0.14em] md:tracking-[0.2em] text-xs md:text-sm hover:opacity-90 transition-all luxury-shadow">
-              The Full Collection
-            </button>
           </div>
 
           <div className="md:hidden">
@@ -546,6 +595,7 @@ export default function App() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.25 }}
+              onClick={() => setIsMobileGalleryPaused((prev) => !prev)}
               onTouchStart={(e) => setTouchStartX(e.changedTouches[0].clientX)}
               onTouchEnd={(e) => {
                 if (touchStartX === null) return;
@@ -566,27 +616,6 @@ export default function App() {
               )}
             </motion.div>
 
-            <div className="mt-4 flex items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={goToPrevGallerySlide}
-                className="h-10 w-10 rounded-full border border-maroon/20 text-maroon hover:bg-maroon/5 transition-colors flex items-center justify-center"
-                aria-label="Previous gallery image"
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <span className="text-xs font-semibold tracking-[0.12em] uppercase text-maroon/70">
-                {mobileGalleryIndex + 1} / {mobileGalleryImages.length}
-              </span>
-              <button
-                type="button"
-                onClick={goToNextGallerySlide}
-                className="h-10 w-10 rounded-full border border-maroon/20 text-maroon hover:bg-maroon/5 transition-colors flex items-center justify-center"
-                aria-label="Next gallery image"
-              >
-                <ChevronRight size={18} />
-              </button>
-            </div>
           </div>
 
           <div className="hidden md:block md:columns-2 lg:columns-3 gap-6 space-y-6">
@@ -601,25 +630,22 @@ export default function App() {
               </motion.div>
             ))}
           </div>
+          <div className="mt-10 flex justify-center">
+            <button onClick={() => navigate('/gallery')} className="gold-gradient text-maroon px-8 md:px-12 py-3.5 md:py-4 rounded-full font-bold uppercase tracking-[0.14em] md:tracking-[0.2em] text-xs md:text-sm hover:opacity-90 transition-all luxury-shadow">
+              The Full Collection
+            </button>
+          </div>
         </div>
       </section>
 
       {/* --- Testimonials --- */}
       <section className="py-[30px] sm:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-4 mb-16">
+          <div className="text-center md:text-left mb-16">
             <div className="text-center md:text-left">
               <p className="text-gold font-sans font-semibold tracking-[0.3em] uppercase mb-4">Kind Words</p>
               <h2 className="text-4xl md:text-5xl font-serif text-maroon">Guest Experiences</h2>
             </div>
-            <a
-              href="https://www.google.com/search?sca_esv=eafbc91c2287ff45&rlz=1C1GCEA_enIN1194IN1194&sxsrf=ANbL-n4Itz5uG94gksEmInWKFeUZEb4-zA:1774851959055&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOanTb2_xnxYemQeN8JdSkgTtcQb7_Mhl-xQUO85jfdsha-wHMWFKmKkMNBQUh8H5L4L9mYlg_budy0w-Q65eseYSkACd5ZLd6yXEtJX2Al-er6TmWQ%3D%3D&q=Amaravati+Conventions+Reviews&sa=X&ved=2ahUKEwidnLHk_saTAxVhTGwGHVtNGEMQ0bkNegQIJRAH&biw=1920&bih=919&dpr=1"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="gold-gradient text-maroon px-6 md:px-8 py-3 rounded-full font-bold uppercase tracking-[0.14em] md:tracking-[0.25em] text-xs md:text-sm hover:opacity-90 transition-all whitespace-nowrap"
-            >
-              Read More
-            </a>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -653,6 +679,16 @@ export default function App() {
                 </div>
               </motion.div>
             ))}
+          </div>
+          <div className="mt-10 flex justify-center">
+            <a
+              href="https://www.google.com/search?sca_esv=eafbc91c2287ff45&rlz=1C1GCEA_enIN1194IN1194&sxsrf=ANbL-n4Itz5uG94gksEmInWKFeUZEb4-zA:1774851959055&si=AL3DRZEsmMGCryMMFSHJ3StBhOdZ2-6yYkXd_doETEE1OR-qOanTb2_xnxYemQeN8JdSkgTtcQb7_Mhl-xQUO85jfdsha-wHMWFKmKkMNBQUh8H5L4L9mYlg_budy0w-Q65eseYSkACd5ZLd6yXEtJX2Al-er6TmWQ%3D%3D&q=Amaravati+Conventions+Reviews&sa=X&ved=2ahUKEwidnLHk_saTAxVhTGwGHVtNGEMQ0bkNegQIJRAH&biw=1920&bih=919&dpr=1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="gold-gradient text-maroon px-6 md:px-8 py-3 rounded-full font-bold uppercase tracking-[0.14em] md:tracking-[0.25em] text-xs md:text-sm hover:opacity-90 transition-all whitespace-nowrap"
+            >
+              Read More
+            </a>
           </div>
         </div>
       </section>
@@ -803,8 +839,8 @@ export default function App() {
       <footer className="bg-[#1a1a1a] text-white pt-6 pb-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-10 items-start">
-            <div className="col-span-2 lg:col-span-1 flex min-h-0 flex-col items-center lg:items-start text-center lg:text-left">
-              <div className="pt-1 sm:pt-2 lg:pt-3">
+            <div className="col-span-2 sm:col-span-1 w-full pb-0 flex min-h-0 flex-col items-center lg:items-start text-center lg:text-left">
+              <div className="pt-0 sm:pt-2 lg:pt-3">
                 <div className="mb-0 flex w-full justify-center lg:justify-start">
                   <div className="flex h-32 w-40 shrink-0 items-start justify-center lg:justify-start sm:h-48 sm:w-48 md:h-56 md:w-56">
                     <img
@@ -815,12 +851,15 @@ export default function App() {
                   </div>
                 </div>
               </div>
-              <p className="mt-2 text-white/40 text-sm leading-relaxed">
+            </div>
+
+            <div className="col-span-2 sm:col-span-1 w-full -mt-3 sm:mt-0 sm:pt-7 lg:pt-8 text-center sm:text-left">
+              <p className="text-white/40 text-sm leading-relaxed">
                 Vijayawada's premier destination for luxury weddings, corporate events, and grand celebrations. Experience world-class hospitality in the heart of the city.
               </p>
             </div>
 
-            <div className="pt-3 sm:pt-4 lg:pt-5">
+            <div className="w-full pl-2 sm:pl-0 pt-3 sm:pt-4 lg:pt-5">
               <h4 className="font-serif text-lg mb-6">Quick Links</h4>
               <ul className="space-y-3 text-white/50 text-sm">
                 {[
@@ -839,7 +878,7 @@ export default function App() {
               </ul>
             </div>
 
-            <div className="pt-3 sm:pt-4 lg:pt-5">
+            <div className="w-full pt-3 sm:pt-4 lg:pt-5">
               <h4 className="font-serif text-lg mb-6">Event Types</h4>
               <ul className="space-y-3 text-white/50 text-sm">
                 {['Weddings & Receptions', 'Corporate Conferences', 'Product Launches', 'Exhibitions', 'Private Celebrations'].map(item => (
@@ -850,23 +889,6 @@ export default function App() {
                   </li>
                 ))}
               </ul>
-            </div>
-
-            <div className="col-span-2 lg:col-span-1 pt-3 sm:pt-4 lg:pt-5">
-              <h4 className="font-serif text-lg mb-6">Newsletter</h4>
-              <p className="text-white/40 text-sm mb-5 leading-relaxed">
-                Subscribe to get updates on our latest packages and event inspirations.
-              </p>
-              <form className="flex flex-col sm:flex-row" onSubmit={(e) => e.preventDefault()}>
-                <input
-                  type="email"
-                  placeholder="Email Address"
-                  className="flex-1 bg-white/10 border border-white/10 px-4 py-3 rounded-t-lg sm:rounded-l-lg sm:rounded-tr-none text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-gold"
-                />
-                <button className="gold-gradient text-maroon px-4 py-3 rounded-b-lg sm:rounded-r-lg sm:rounded-bl-none hover:opacity-90 transition-all">
-                  <ArrowRight size={18} />
-                </button>
-              </form>
             </div>
           </div>
 
