@@ -965,6 +965,15 @@ export default function App() {
       </footer>
 
       {/* --- Sticky Elements --- */}
+      <div className="md:hidden fixed bottom-4 left-4 right-4 z-50">
+        <button
+          onClick={() => scrollToSection('#contact')}
+          className="w-full gold-gradient text-maroon py-2.5 rounded-full font-bold uppercase tracking-[0.1em] text-[11px] luxury-shadow hover:opacity-90 transition-all"
+        >
+          Enquire Now
+        </button>
+      </div>
+
       <div className="hidden md:block fixed bottom-8 left-8 z-50">
         <a 
           href="https://wa.me/919000387878" 
