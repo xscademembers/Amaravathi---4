@@ -146,13 +146,23 @@ const DEFAULT_GALLERY_IMAGES = [
 ];
 
 // --- Components ---
-const GalleryImage = ({ src, alt, index }: { src: string; alt: string; index: number }) => {
+const GalleryImage = ({
+  src,
+  alt,
+  index,
+  fixedAspect = false,
+}: {
+  src: string;
+  alt: string;
+  index: number;
+  fixedAspect?: boolean;
+}) => {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
   if (error) {
     return (
-      <div className="aspect-video bg-maroon/5 flex flex-col items-center justify-center p-8 text-center border border-maroon/10 rounded-3xl">
+      <div className={`${fixedAspect ? 'aspect-[4/3]' : 'aspect-video'} bg-maroon/5 flex flex-col items-center justify-center p-8 text-center border border-maroon/10 rounded-3xl`}>
         <ImageOff className="w-12 h-12 text-maroon/20 mb-4" />
         <p className="text-maroon/40 font-serif text-sm italic">Image {index + 1} failed to load</p>
       </div>
@@ -160,11 +170,11 @@ const GalleryImage = ({ src, alt, index }: { src: string; alt: string; index: nu
   }
 
   return (
-    <div className={`relative rounded-3xl overflow-hidden luxury-shadow group cursor-pointer bg-maroon/5 ${loading ? 'animate-pulse min-h-[200px]' : ''}`}>
+    <div className={`relative rounded-3xl overflow-hidden luxury-shadow group cursor-pointer bg-maroon/5 ${fixedAspect ? 'aspect-[4/3]' : ''} ${loading ? (fixedAspect ? 'animate-pulse' : 'animate-pulse min-h-[200px]') : ''}`}>
       <img 
         src={src} 
         alt={alt} 
-        className={`w-full h-auto group-hover:scale-105 transition-all duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
+        className={`w-full ${fixedAspect ? 'h-full object-cover' : 'h-auto'} group-hover:scale-105 transition-all duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
         referrerPolicy="no-referrer"
         onLoad={() => setLoading(false)}
         onError={(e) => {
@@ -612,6 +622,7 @@ export default function App() {
                   src={mobileGalleryImages[mobileGalleryIndex]}
                   alt={`Gallery ${mobileGalleryIndex + 1}`}
                   index={mobileGalleryIndex}
+                  fixedAspect
                 />
               )}
             </motion.div>
