@@ -847,6 +847,10 @@ export default function App() {
                       src="/logo%20accepted.png"
                       alt="Amaravathi Conventions"
                       className="max-h-full w-full max-w-full object-contain object-center lg:object-left object-top"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = '/Footer%20logo.png';
+                      }}
                     />
                   </div>
                 </div>
