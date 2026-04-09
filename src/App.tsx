@@ -135,6 +135,8 @@ const FACILITIES: Facility[] = [
 ];
 
 const API = import.meta.env.VITE_API_URL || '';
+const MOBILE_GALLERY_AUTOPLAY_MS = 5000;
+const MOBILE_GALLERY_TICK_MS = 100;
 
 const DEFAULT_GALLERY_IMAGES = [
   'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800',
@@ -200,6 +202,7 @@ export default function App() {
   const [eventTouchStartX, setEventTouchStartX] = useState<number | null>(null);
   const [mobileGalleryIndex, setMobileGalleryIndex] = useState(0);
   const [isMobileGalleryPaused, setIsMobileGalleryPaused] = useState(false);
+  const [mobileGalleryProgressMs, setMobileGalleryProgressMs] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [formData, setFormData] = useState({ name: '', phone: '', eventType: 'Wedding', eventDate: '', message: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -221,14 +224,23 @@ export default function App() {
   useEffect(() => { fetchGallery(); }, [fetchGallery]);
   useEffect(() => {
     setMobileGalleryIndex((prev) => (mobileGalleryImages.length ? Math.min(prev, mobileGalleryImages.length - 1) : 0));
+    setMobileGalleryProgressMs(0);
   }, [mobileGalleryImages.length]);
   useEffect(() => {
     if (mobileGalleryImages.length <= 1 || isMobileGalleryPaused) return;
     const timer = window.setInterval(() => {
-      setMobileGalleryIndex((prev) => (prev + 1) % mobileGalleryImages.length);
-    }, 5000);
+      setMobileGalleryProgressMs((prev) => Math.min(prev + MOBILE_GALLERY_TICK_MS, MOBILE_GALLERY_AUTOPLAY_MS));
+    }, MOBILE_GALLERY_TICK_MS);
     return () => clearInterval(timer);
   }, [mobileGalleryImages.length, isMobileGalleryPaused]);
+
+  useEffect(() => {
+    if (mobileGalleryImages.length <= 1 || isMobileGalleryPaused) return;
+    if (mobileGalleryProgressMs < MOBILE_GALLERY_AUTOPLAY_MS) return;
+
+    setMobileGalleryIndex((prev) => (prev + 1) % mobileGalleryImages.length);
+    setMobileGalleryProgressMs(0);
+  }, [mobileGalleryProgressMs, mobileGalleryImages.length, isMobileGalleryPaused]);
 
   useEffect(() => {
     if (!location.hash) return;
@@ -281,11 +293,13 @@ export default function App() {
   const goToPrevGallerySlide = () => {
     if (!mobileGalleryImages.length) return;
     setMobileGalleryIndex((prev) => (prev - 1 + mobileGalleryImages.length) % mobileGalleryImages.length);
+    setMobileGalleryProgressMs(0);
   };
 
   const goToNextGallerySlide = () => {
     if (!mobileGalleryImages.length) return;
     setMobileGalleryIndex((prev) => (prev + 1) % mobileGalleryImages.length);
+    setMobileGalleryProgressMs(0);
   };
 
   const goToPrevEventSlide = () => {
@@ -626,6 +640,20 @@ export default function App() {
                 />
               )}
             </motion.div>
+
+            {mobileGalleryImages.length > 0 && (
+              <div className="mt-4 px-1">
+                <div className="flex items-center text-[10px] uppercase tracking-[0.16em] text-maroon/60 mb-2">
+                  <span>Slide {mobileGalleryIndex + 1}</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-maroon/10 overflow-hidden">
+                  <div
+                    className="h-full rounded-full gold-gradient transition-all duration-300"
+                    style={{ width: `${Math.min(100, (mobileGalleryProgressMs / MOBILE_GALLERY_AUTOPLAY_MS) * 100)}%` }}
+                  />
+                </div>
+              </div>
+            )}
 
           </div>
 
@@ -969,7 +997,7 @@ export default function App() {
         <button
           type="button"
           onClick={() => scrollToSection('#contact')}
-          className="bg-[#25D366] text-white p-3.5 rounded-full luxury-shadow hover:scale-110 transition-transform block"
+          className="gold-gradient text-maroon p-3.5 rounded-full luxury-shadow hover:scale-110 transition-transform block"
         >
           <MessageCircle size={24} />
         </button>
