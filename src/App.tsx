@@ -844,13 +844,9 @@ export default function App() {
                 <div className="mb-0 flex w-full justify-center lg:justify-start">
                   <div className="flex h-fit w-40 shrink-0 items-start justify-center lg:justify-start sm:w-48 md:w-56">
                     <img
-                      src="/logo%20accepted.png"
+                      src="/1.png"
                       alt="Amaravathi Conventions"
                       className="max-h-full w-full max-w-full object-contain object-center lg:object-left object-top"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = '/Footer%20logo.png';
-                      }}
                     />
                   </div>
                 </div>
