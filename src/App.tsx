@@ -836,10 +836,10 @@ export default function App() {
       </section>
 
       {/* --- Footer --- */}
-      <footer className="h-fit bg-[#1a1a1a] text-white pt-5 pb-3 lg:pt-4 lg:pb-2.5">
+      <footer className="h-fit bg-[#1a1a1a] text-white pt-6 pb-4 lg:pt-4 lg:pb-2.5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-10 md:gap-y-10 md:gap-x-10 mb-[5px] lg:gap-y-8 lg:gap-x-10 lg:mb-6 items-start h-fit">
-            <div className="col-span-2 sm:col-span-1 w-full pb-0 flex min-h-0 flex-col items-center lg:items-start text-center lg:text-left">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-8 md:gap-y-10 md:gap-x-10 mb-2 lg:gap-y-8 lg:gap-x-10 lg:mb-6 items-start h-fit">
+            <div className="col-span-2 lg:col-span-1 w-full pb-0 flex min-h-0 flex-col items-center lg:items-start text-center lg:text-left">
               <div className="pt-0 sm:pt-2 lg:pt-3">
                 <div className="mb-0 flex w-full justify-center lg:justify-start">
                   <div className="flex h-fit w-40 shrink-0 items-start justify-center lg:justify-start sm:w-48 md:w-56">
@@ -853,13 +853,13 @@ export default function App() {
               </div>
             </div>
 
-            <div className="col-span-2 sm:col-span-1 w-full -mt-3 sm:mt-0 sm:pt-7 lg:pt-15 lg:mr-10 text-center sm:text-left">
+            <div className="col-span-2 lg:col-span-1 w-full sm:pt-5 lg:pt-10 lg:mr-10 text-center sm:text-left">
               <p className="text-white/40 text-sm leading-relaxed">
                 Vijayawada's premier destination for luxury weddings, corporate events, and grand celebrations. Experience world-class hospitality in the heart of the city.
               </p>
             </div>
 
-            <div className="w-[160px] pl-[60px] pt-3 sm:pt-4 lg:pt-3 lg:-ml-1">
+            <div className="w-full pt-1 sm:pt-4 lg:pt-3 text-center sm:text-left">
               <h4 className="font-serif text-lg mb-4 lg:mb-3">Quick Links</h4>
               <ul className="space-y-2 lg:space-y-1.5 text-white/50 text-sm">
                 {[
@@ -878,7 +878,7 @@ export default function App() {
               </ul>
             </div>
 
-            <div className="w-full pt-3 sm:pt-4 lg:pt-3 lg:-ml-1">
+            <div className="w-full pt-1 sm:pt-4 lg:pt-3 text-center sm:text-left">
               <h4 className="font-serif text-lg mb-4 lg:mb-3">Event Types</h4>
               <ul className="space-y-2 lg:space-y-1.5 text-white/50 text-sm">
                 {['Weddings & Receptions', 'Corporate Conferences', 'Product Launches', 'Exhibitions', 'Private Celebrations'].map(item => (
@@ -892,9 +892,9 @@ export default function App() {
             </div>
           </div>
 
-          <div className="border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-3 lg:gap-2 text-white/30 text-[10px] md:text-[11px] uppercase tracking-[0.12em] md:tracking-[0.2em] text-center md:text-left">
-            <p>&copy; 2026 Amaravathi Conventions. All Rights Reserved.</p>
-            <div className="flex gap-5 md:gap-8">
+          <div className="border-t border-white/10 pt-3 flex flex-col md:flex-row justify-between items-center gap-3 lg:gap-2 text-white/30 text-[10px] md:text-[11px] uppercase tracking-[0.08em] md:tracking-[0.2em] text-center md:text-left">
+            <p className="leading-relaxed">&copy; 2026 Amaravathi Conventions. All Rights Reserved.</p>
+            <div className="flex flex-wrap justify-center gap-4 md:gap-8">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
             </div>
