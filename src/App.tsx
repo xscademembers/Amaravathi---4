@@ -838,13 +838,64 @@ export default function App() {
       {/* --- Footer --- */}
       <footer className="h-fit bg-[#1a1a1a] text-white pt-6 pb-4 lg:pt-4 lg:pb-2.5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-8 md:gap-y-10 md:gap-x-10 mb-2 lg:gap-y-8 lg:gap-x-10 lg:mb-6 items-start h-fit">
+          <div className="sm:hidden mb-2">
+            <div className="flex flex-col items-center text-center">
+              <img
+                src="/logo%20accepted.png"
+                alt="Amaravathi Conventions"
+                className="w-44 object-contain"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = '/amaravathi%20Logo%201.svg';
+                }}
+              />
+              <p className="mt-4 text-white/40 text-sm leading-relaxed max-w-xs">
+                Vijayawada's premier destination for luxury weddings, corporate events, and grand celebrations. Experience world-class hospitality in the heart of the city.
+              </p>
+            </div>
+
+            <div className="mt-7 grid grid-cols-2 gap-4">
+              <div className="w-full text-center">
+                <h4 className="font-serif text-lg mb-4">Quick Links</h4>
+                <ul className="space-y-2 text-white/50 text-sm">
+                  {[
+                    { label: 'Home', href: '#home' },
+                    { label: 'About Venue', href: '#about' },
+                    { label: 'Event Types', href: '#events' },
+                    { label: 'Gallery', href: '#gallery' },
+                    { label: 'Contact Us', href: '#contact' },
+                  ].map(item => (
+                    <li key={item.label}>
+                      <button onClick={() => scrollToSection(item.href)} className="hover:text-gold transition-colors">
+                        {item.label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="w-full text-center">
+                <h4 className="font-serif text-lg mb-4">Event Types</h4>
+                <ul className="space-y-2 text-white/50 text-sm">
+                  {['Weddings & Receptions', 'Corporate Conferences', 'Product Launches', 'Exhibitions', 'Private Celebrations'].map(item => (
+                    <li key={item}>
+                      <button onClick={() => scrollToSection('#events')} className="hover:text-gold transition-colors">
+                        {item}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-8 md:gap-y-10 md:gap-x-10 mb-2 lg:gap-y-8 lg:gap-x-10 lg:mb-6 items-start h-fit">
             <div className="col-span-2 lg:col-span-1 w-full pb-0 flex min-h-0 flex-col items-center lg:items-start text-center lg:text-left">
               <div className="pt-0 sm:pt-2 lg:pt-3">
                 <div className="mb-0 flex w-full justify-center lg:justify-start">
                   <div className="flex h-fit w-40 shrink-0 items-start justify-center lg:justify-start sm:w-48 md:w-56">
                     <img
-                      src="/1.png"
+                      src="/logo%20accepted.png"
                       alt="Amaravathi Conventions"
                       className="max-h-full w-full max-w-full object-contain object-center lg:object-left object-top"
                     />
