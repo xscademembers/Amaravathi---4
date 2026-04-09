@@ -965,12 +965,13 @@ export default function App() {
       </footer>
 
       {/* --- Sticky Elements --- */}
-      <div className="md:hidden fixed bottom-4 left-4 right-4 z-50">
+      <div className="md:hidden fixed bottom-6 right-4 z-50">
         <button
+          type="button"
           onClick={() => scrollToSection('#contact')}
-          className="w-full gold-gradient text-maroon py-2.5 rounded-full font-bold uppercase tracking-[0.1em] text-[11px] luxury-shadow hover:opacity-90 transition-all"
+          className="bg-[#25D366] text-white p-3.5 rounded-full luxury-shadow hover:scale-110 transition-transform block"
         >
-          Enquire Now
+          <MessageCircle size={24} />
         </button>
       </div>
 
