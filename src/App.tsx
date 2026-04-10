@@ -87,7 +87,7 @@ const EVENT_TYPES: EventType[] = [
   { 
     title: 'Exhibitions & Expos',
     description: 'Spacious layouts perfect for trade shows, art exhibitions, and lifestyle expos.',
-    image: 'https://images.unsplash.com/photo-1540575861501-7cf05a4b125a?auto=format&fit=crop&q=80&w=800'
+    image: '/expo.png'
   },
   { 
     title: 'Private Celebrations',
@@ -320,7 +320,7 @@ export default function App() {
       <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-4 sm:pt-8">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=1920" 
+            src="/DSC05370.jpg" 
             alt="Luxury Wedding Setup" 
             className="w-full h-full object-cover scale-105"
             referrerPolicy="no-referrer"
@@ -411,9 +411,9 @@ export default function App() {
             >
               <div className="aspect-[4/5] w-[88%] sm:w-full mx-auto rounded-3xl overflow-hidden luxury-shadow">
                 <img 
-                  src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800" 
+                  src="/DSC05341.jpg" 
                   alt="Venue Interior" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-[center_73%]"
                   referrerPolicy="no-referrer"
                 />
               </div>
@@ -643,9 +643,6 @@ export default function App() {
 
             {mobileGalleryImages.length > 0 && (
               <div className="mt-4 px-1">
-                <div className="flex items-center text-[10px] uppercase tracking-[0.16em] text-maroon/60 mb-2">
-                  <span>Slide {mobileGalleryIndex + 1}</span>
-                </div>
                 <div className="h-1.5 rounded-full bg-maroon/10 overflow-hidden">
                   <div
                     className="h-full rounded-full gold-gradient transition-all duration-300"
