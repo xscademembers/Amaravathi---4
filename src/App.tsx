@@ -102,7 +102,7 @@ const EVENT_TYPES: EventType[] = [
   {
     title: 'Cultural & Religious Events',
     description: 'A versatile setting for cultural gatherings, spiritual functions, and community celebrations.',
-    image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&q=80&w=800'
+    image: '/events.png'
   },
   {
     title: 'College Events & Fests',
