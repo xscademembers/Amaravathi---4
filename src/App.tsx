@@ -10,7 +10,6 @@ import {
   Users, 
   Maximize, 
   MapPin, 
-  CheckCircle2, 
   Phone, 
   MessageCircle, 
   Calendar, 
@@ -77,7 +76,7 @@ const EVENT_TYPES: EventType[] = [
   { 
     title: 'Weddings & Receptions', 
     description: 'Create timeless memories in our grand hall with exquisite decor and premium catering.',
-    image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800'
+    image: '/wedding.jpeg'
   },
   { 
     title: 'Corporate Conferences', 
@@ -92,27 +91,27 @@ const EVENT_TYPES: EventType[] = [
   { 
     title: 'Private Celebrations',
     description: 'Intimate spaces for birthdays, anniversaries, and traditional ceremonies.',
-    image: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=800'
+    image: '/private celebration image.jpeg'
   },
   {
     title: 'Product Launches',
     description: 'Launch your brand with impact in a premium venue built for visibility and engagement.',
-    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800'
+    image: '/product-launch-event-.png'
   },
   {
     title: 'Cultural & Religious Events',
     description: 'A versatile setting for cultural gatherings, spiritual functions, and community celebrations.',
-    image: '/events.png'
+    image: '/religious image.jpeg'
   },
   {
     title: 'College Events & Fests',
     description: 'Host vibrant student events, fests, and annual celebrations with full event support.',
-    image: 'https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&q=80&w=800'
+    image: '/college image.jpg'
   },
   {
     title: 'Government & Political Events',
     description: 'Reliable infrastructure and spacious arrangements for large formal gatherings and public events.',
-    image: 'https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?auto=format&fit=crop&q=80&w=800'
+    image: '/political.jpeg'
   },
 ];
 
@@ -431,21 +430,19 @@ export default function App() {
               <p className="text-gold font-sans font-semibold tracking-widest uppercase mb-4">Welcome to Amaravathi</p>
               <h2 className="text-4xl md:text-5xl font-serif text-maroon mb-8 leading-tight">Where Grandeur Meets <span className="italic">Tradition</span></h2>
               <p className="text-charcoal/80 mb-6 leading-relaxed">
-                Located in the heart of Vijayawada on the main road, Amaravathi Conventions is just 1 km from the bus station and railway station. Our venue is designed to host everything from grand weddings to high-profile corporate conferences.
+                Experience timeless elegance with European-style interiors that add a premium and sophisticated touch to every event.
               </p>
-              <div className="space-y-4 mb-10">
+              <ul className="mb-10 list-disc pl-6 space-y-4 marker:text-gold">
                 {[
-                  'Centrally located near Railway & Bus Station (1 km)',
-                  'Spacious 8000 sq ft Main Hall & 5000 sq ft Canopy',
-                  'Exquisite interiors with modern amenities',
-                  'Budget-friendly luxury packages'
+                  'Capacity up to 400 guests',
+                  'Suitable for weddings, birthdays, corporate events, exhibitions, and more',
+                  'Customizable layouts for different event types'
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <CheckCircle2 className="text-gold w-5 h-5 flex-shrink-0" />
-                    <span className="text-charcoal/90">{item}</span>
-                  </div>
+                  <li key={i} className="text-charcoal/90">
+                    {item}
+                  </li>
                 ))}
-              </div>
+              </ul>
               <button 
                 onClick={() => scrollToSection('#contact')}
                 className="group flex items-center gap-3 text-maroon font-bold uppercase tracking-widest hover:text-gold transition-colors"
