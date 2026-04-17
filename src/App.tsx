@@ -76,7 +76,7 @@ const EVENT_TYPES: EventType[] = [
   { 
     title: 'Weddings & Receptions', 
     description: 'Create timeless memories in our grand hall with exquisite decor and premium catering.',
-    image: '/wedding.jpeg'
+    image: '/wed edit.jpeg'
   },
   { 
     title: 'Corporate Conferences', 
@@ -91,7 +91,7 @@ const EVENT_TYPES: EventType[] = [
   { 
     title: 'Private Celebrations',
     description: 'Intimate spaces for birthdays, anniversaries, and traditional ceremonies.',
-    image: '/private celebration image.jpeg'
+    image: '/bday image.jpeg'
   },
   {
     title: 'Product Launches',
@@ -434,9 +434,9 @@ export default function App() {
               </p>
               <ul className="mb-10 list-disc pl-6 space-y-4 marker:text-gold">
                 {[
-                  'Capacity up to 400 guests',
-                  'Suitable for weddings, birthdays, corporate events, exhibitions, and more',
-                  'Customizable layouts for different event types'
+                  'A flexible venue that adapts to a wide range of events.',
+                  'Dynamic and vibrant lighting enhances the overall atmosphere of every event.',
+                  'Located in the heart of the city on MG Road, offering unmatched convenience.'
                 ].map((item, i) => (
                   <li key={i} className="text-charcoal/90">
                     {item}

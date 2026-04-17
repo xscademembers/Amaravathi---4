@@ -5,15 +5,6 @@ import Navbar from '../components/Navbar';
 
 const API = import.meta.env.VITE_API_URL || '';
 
-const DEFAULT_GALLERY_IMAGES = [
-  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=800',
-];
-
 function GalleryImage({ src, index, onClick }: { src: string; index: number; onClick: () => void }) {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -51,7 +42,7 @@ function GalleryImage({ src, index, onClick }: { src: string; index: number; onC
 }
 
 export default function GalleryPage() {
-  const [images, setImages] = useState<string[]>(DEFAULT_GALLERY_IMAGES);
+  const [images, setImages] = useState<string[]>([]);
   const [lightbox, setLightbox] = useState<number | null>(null);
 
   const fetchGallery = useCallback(async () => {
@@ -59,14 +50,20 @@ export default function GalleryPage() {
       const res = await fetch(`${API}/api/gallery`);
       if (res.ok) {
         const data = await res.json();
-        if (data.length > 0) {
-          setImages(data.map((img: { imageUrl: string }) => img.imageUrl));
-        }
+        const nextImages = Array.isArray(data)
+          ? data
+              .map((img: { imageUrl?: string }) => img.imageUrl)
+              .filter((url): url is string => Boolean(url))
+          : [];
+        setImages(nextImages);
       }
     } catch { /* fallback to defaults */ }
   }, []);
 
   useEffect(() => { fetchGallery(); }, [fetchGallery]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
