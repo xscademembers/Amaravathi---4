@@ -34,6 +34,7 @@ import {
   ImageOff
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { trackLead } from './utils/metaPixel';
 
 // --- Types ---
 interface EventType {
@@ -266,6 +267,7 @@ export default function App() {
         body: JSON.stringify(formData),
       });
       if (res.ok) {
+        trackLead(formData.phone);
         setFormStatus('success');
         setFormData({ name: '', phone: '', eventType: 'Wedding', eventDate: '', message: '' });
         setTimeout(() => setFormStatus('idle'), 4000);
