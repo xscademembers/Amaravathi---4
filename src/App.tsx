@@ -34,6 +34,8 @@ import {
   ImageOff
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { fetchGalleryImages } from './lib/gallery';
+import GalleryThumb from './components/GalleryThumb';
 
 // --- Types ---
 interface EventType {
@@ -137,66 +139,11 @@ const API = import.meta.env.VITE_API_URL || '';
 const MOBILE_GALLERY_AUTOPLAY_MS = 5000;
 const MOBILE_GALLERY_TICK_MS = 100;
 
-const DEFAULT_GALLERY_IMAGES = [
-  'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800',
-  'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=800',
-];
-
-// --- Components ---
-const GalleryImage = ({
-  src,
-  alt,
-  index,
-  fixedAspect = false,
-}: {
-  src: string;
-  alt: string;
-  index: number;
-  fixedAspect?: boolean;
-}) => {
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  if (error) {
-    return (
-      <div className={`${fixedAspect ? 'aspect-[4/3]' : 'aspect-video'} bg-maroon/5 flex flex-col items-center justify-center p-8 text-center border border-maroon/10 rounded-3xl`}>
-        <ImageOff className="w-12 h-12 text-maroon/20 mb-4" />
-        <p className="text-maroon/40 font-serif text-sm italic">Image {index + 1} failed to load</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className={`relative rounded-3xl overflow-hidden luxury-shadow group cursor-pointer bg-maroon/5 ${fixedAspect ? 'aspect-[4/3]' : ''} ${loading ? (fixedAspect ? 'animate-pulse' : 'animate-pulse min-h-[200px]') : ''}`}>
-      <img 
-        src={src} 
-        alt={alt} 
-        className={`w-full ${fixedAspect ? 'h-full object-cover' : 'h-auto'} group-hover:scale-105 transition-all duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
-        referrerPolicy="no-referrer"
-        onLoad={() => setLoading(false)}
-        onError={(e) => {
-          console.error(`Gallery Image ${index + 1} failed to load:`, src);
-          setError(true);
-          setLoading(false);
-        }}
-      />
-      {loading && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-maroon/20 border-t-maroon rounded-full animate-spin"></div>
-        </div>
-      )}
-    </div>
-  );
-};
-
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [galleryImages, setGalleryImages] = useState<string[]>(DEFAULT_GALLERY_IMAGES);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [galleryLoading, setGalleryLoading] = useState(true);
   const [mobileEventIndex, setMobileEventIndex] = useState(0);
   const [eventTouchStartX, setEventTouchStartX] = useState<number | null>(null);
   const [mobileGalleryIndex, setMobileGalleryIndex] = useState(0);
@@ -208,19 +155,14 @@ export default function App() {
   const mobileEventSlides = EVENT_TYPES;
   const mobileGalleryImages = galleryImages.slice(0, 10);
 
-  const fetchGallery = useCallback(async () => {
-    try {
-      const res = await fetch(`${API}/api/gallery`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.length > 0) {
-          setGalleryImages(data.map((img: { imageUrl: string }) => img.imageUrl));
-        }
-      }
-    } catch { /* fallback to defaults */ }
+  const loadGallery = useCallback(async () => {
+    setGalleryLoading(true);
+    const images = await fetchGalleryImages();
+    setGalleryImages(images);
+    setGalleryLoading(false);
   }, []);
 
-  useEffect(() => { fetchGallery(); }, [fetchGallery]);
+  useEffect(() => { loadGallery(); }, [loadGallery]);
   useEffect(() => {
     setMobileGalleryIndex((prev) => (mobileGalleryImages.length ? Math.min(prev, mobileGalleryImages.length - 1) : 0));
     setMobileGalleryProgressMs(0);
@@ -610,6 +552,12 @@ export default function App() {
             </div>
           </div>
 
+          {galleryLoading && galleryImages.length === 0 && (
+            <div className="flex justify-center py-16">
+              <div className="w-10 h-10 border-2 border-maroon/20 border-t-maroon rounded-full animate-spin" />
+            </div>
+          )}
+
           <div className="md:hidden">
             <motion.div
               key={mobileGalleryImages[mobileGalleryIndex] ?? 'mobile-gallery-fallback'}
@@ -629,7 +577,7 @@ export default function App() {
               }}
             >
               {mobileGalleryImages.length > 0 && (
-                <GalleryImage
+                <GalleryThumb
                   src={mobileGalleryImages[mobileGalleryIndex]}
                   alt={`Gallery ${mobileGalleryIndex + 1}`}
                   index={mobileGalleryIndex}
@@ -659,12 +607,12 @@ export default function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
               >
-                <GalleryImage src={img} alt={`Gallery ${i + 1}`} index={i} />
+                <GalleryThumb src={img} alt={`Gallery ${i + 1}`} index={i} />
               </motion.div>
             ))}
           </div>
           <div className="mt-10 flex justify-center">
-            <button onClick={() => navigate('/gallery')} className="gold-gradient text-maroon px-8 md:px-12 py-3.5 md:py-4 rounded-full font-bold uppercase tracking-[0.14em] md:tracking-[0.2em] text-xs md:text-sm hover:opacity-90 transition-all luxury-shadow">
+            <button onClick={() => { window.scrollTo(0, 0); navigate('/gallery'); }} className="gold-gradient text-maroon px-8 md:px-12 py-3.5 md:py-4 rounded-full font-bold uppercase tracking-[0.14em] md:tracking-[0.2em] text-xs md:text-sm hover:opacity-90 transition-all luxury-shadow">
               The Full Collection
             </button>
           </div>

@@ -1,10 +1,14 @@
 import { Router } from 'express';
 import Contact from '../models/Contact.js';
 import { authMiddleware } from './auth.js';
+import { isDbConnected } from '../db.js';
 
 const router = Router();
 
 router.post('/', async (req, res) => {
+  if (!isDbConnected()) {
+    return res.status(503).json({ error: 'Database unavailable. Please try again shortly.' });
+  }
   try {
     const { name, phone, eventType, eventDate, message } = req.body;
     if (!name || !phone || !eventType) {
@@ -19,11 +23,14 @@ router.post('/', async (req, res) => {
 });
 
 router.get('/', authMiddleware, async (req, res) => {
+  if (!isDbConnected()) {
+    return res.json([]);
+  }
   try {
     const contacts = await Contact.find().sort({ createdAt: -1 });
     res.json(contacts);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch {
+    res.json([]);
   }
 });
 

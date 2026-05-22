@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { resolveGalleryImageSrc } from '../lib/gallery';
 import {
   ImagePlus,
   Trash2,
@@ -73,10 +74,11 @@ function GalleryManager() {
     setLoading(true);
     try {
       const res = await fetch(`${API}/api/gallery`);
-      const data = await res.json();
-      setImages(data);
+      const data = res.ok ? await res.json() : [];
+      setImages(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to fetch gallery:', err);
+      setImages([]);
     } finally {
       setLoading(false);
     }
@@ -84,7 +86,7 @@ function GalleryManager() {
 
   useEffect(() => { fetchImages(); }, [fetchImages]);
 
-  const handleAdd = async (e: React.FormEvent) => {
+  const handleAdd = async (e: FormEvent) => {
     e.preventDefault();
     if (!imageUrl.trim()) return;
     setSubmitting(true);
@@ -165,7 +167,7 @@ function GalleryManager() {
           </div>
           {imageUrl && (
             <div className="mb-4 rounded-xl overflow-hidden border border-white/10 max-w-xs">
-              <img src={imageUrl} alt="Preview" className="w-full h-40 object-cover" onError={e => (e.currentTarget.style.display = 'none')} />
+              <img src={resolveGalleryImageSrc(imageUrl)} alt="Preview" className="w-full h-40 object-cover" onError={e => (e.currentTarget.style.display = 'none')} />
             </div>
           )}
           <button
@@ -193,7 +195,7 @@ function GalleryManager() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {images.map(img => (
             <div key={img._id} className="group relative rounded-xl overflow-hidden border border-white/10 bg-white/5">
-              <img src={img.imageUrl} alt={img.title} className="w-full h-40 object-cover" referrerPolicy="no-referrer" />
+              <img src={resolveGalleryImageSrc(img.imageUrl)} alt={img.title} className="w-full h-40 object-cover" />
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                 <button
                   onClick={() => handleDelete(img._id)}
@@ -225,10 +227,11 @@ function ContactManager() {
     setLoading(true);
     try {
       const res = await fetch(`${API}/api/contacts`, { headers: authHeaders() });
-      const data = await res.json();
-      setContacts(data);
+      const data = res.ok ? await res.json() : [];
+      setContacts(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to fetch contacts:', err);
+      setContacts([]);
     } finally {
       setLoading(false);
     }

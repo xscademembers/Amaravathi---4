@@ -2,65 +2,22 @@ import { useState, useEffect, useCallback } from 'react';
 import { ImageOff, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Navbar from '../components/Navbar';
-
-const API = import.meta.env.VITE_API_URL || '';
-
-function GalleryImage({ src, index, onClick }: { src: string; index: number; onClick: () => void }) {
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  if (error) {
-    return (
-      <div className="aspect-video bg-maroon/5 flex flex-col items-center justify-center p-8 text-center border border-maroon/10 rounded-2xl">
-        <ImageOff className="w-10 h-10 text-maroon/20 mb-3" />
-        <p className="text-maroon/40 font-serif text-sm italic">Image failed to load</p>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className={`relative rounded-2xl overflow-hidden group cursor-pointer bg-maroon/5 ${loading ? 'animate-pulse min-h-[200px]' : ''}`}
-      onClick={onClick}
-    >
-      <img
-        src={src}
-        alt={`Gallery ${index + 1}`}
-        className={`w-full h-auto group-hover:scale-105 transition-all duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
-        referrerPolicy="no-referrer"
-        onLoad={() => setLoading(false)}
-        onError={() => { setError(true); setLoading(false); }}
-      />
-      {loading && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-maroon/20 border-t-maroon rounded-full animate-spin" />
-        </div>
-      )}
-      <div className="absolute inset-0 bg-maroon/0 group-hover:bg-maroon/20 transition-colors" />
-    </div>
-  );
-}
+import GalleryThumb from '../components/GalleryThumb';
+import { fetchGalleryImages } from '../lib/gallery';
 
 export default function GalleryPage() {
   const [images, setImages] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
   const [lightbox, setLightbox] = useState<number | null>(null);
 
-  const fetchGallery = useCallback(async () => {
-    try {
-      const res = await fetch(`${API}/api/gallery`);
-      if (res.ok) {
-        const data = await res.json();
-        const nextImages = Array.isArray(data)
-          ? data
-              .map((img: { imageUrl?: string }) => img.imageUrl)
-              .filter((url): url is string => Boolean(url))
-          : [];
-        setImages(nextImages);
-      }
-    } catch { /* fallback to defaults */ }
+  const loadGallery = useCallback(async () => {
+    setLoading(true);
+    const urls = await fetchGalleryImages();
+    setImages(urls);
+    setLoading(false);
   }, []);
 
-  useEffect(() => { fetchGallery(); }, [fetchGallery]);
+  useEffect(() => { loadGallery(); }, [loadGallery]);
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, []);
@@ -110,20 +67,34 @@ export default function GalleryPage() {
 
       {/* Gallery Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        {loading && (
+          <div className="flex justify-center py-20">
+            <div className="w-10 h-10 border-2 border-maroon/20 border-t-maroon rounded-full animate-spin" />
+          </div>
+        )}
+
+        {!loading && (
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-5 space-y-5">
           {images.map((img, i) => (
             <motion.div
-              key={i}
+              key={`${img}-${i}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
             >
-              <GalleryImage src={img} index={i} onClick={() => setLightbox(i)} />
+              <GalleryThumb
+                src={img}
+                alt={`Gallery ${i + 1}`}
+                index={i}
+                rounded="2xl"
+                onClick={() => setLightbox(i)}
+              />
             </motion.div>
           ))}
         </div>
+        )}
 
-        {images.length === 0 && (
+        {!loading && images.length === 0 && (
           <div className="text-center py-12 text-charcoal/30">
             <ImageOff size={48} className="mx-auto mb-4 opacity-30" />
             <p className="font-serif text-lg">No images yet</p>
@@ -164,7 +135,6 @@ export default function GalleryPage() {
               src={images[lightbox]}
               alt={`Gallery ${lightbox + 1}`}
               className="max-h-[85vh] max-w-[90vw] object-contain rounded-xl"
-              referrerPolicy="no-referrer"
               onClick={e => e.stopPropagation()}
             />
 
