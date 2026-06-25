@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ImageOff } from 'lucide-react';
-import { STATIC_GALLERY_FALLBACK } from '../lib/gallery';
 
 type GalleryThumbProps = {
   src: string;
@@ -27,13 +26,10 @@ export default function GalleryThumb({
 }: GalleryThumbProps) {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [displaySrc, setDisplaySrc] = useState(src);
   const imgRef = useRef<HTMLImageElement>(null);
-  const fallbackSrc = STATIC_GALLERY_FALLBACK[index % STATIC_GALLERY_FALLBACK.length];
   const roundClass = rounded === '2xl' ? 'rounded-2xl' : 'rounded-3xl';
 
   useEffect(() => {
-    setDisplaySrc(src);
     setError(false);
     setLoading(true);
     markLoaded(imgRef.current, setLoading);
@@ -42,21 +38,16 @@ export default function GalleryThumb({
   const handleLoad = useCallback(() => setLoading(false), []);
 
   const handleError = useCallback(() => {
-    if (displaySrc !== fallbackSrc) {
-      setDisplaySrc(fallbackSrc);
-      setLoading(true);
-      return;
-    }
     setError(true);
     setLoading(false);
-  }, [displaySrc, fallbackSrc]);
+  }, []);
 
   const setImgRef = useCallback(
     (el: HTMLImageElement | null) => {
       imgRef.current = el;
       markLoaded(el, setLoading);
     },
-    [displaySrc]
+    [src]
   );
 
   if (error) {
@@ -77,7 +68,7 @@ export default function GalleryThumb({
     >
       <img
         ref={setImgRef}
-        src={displaySrc}
+        src={src}
         alt={alt}
         className={`w-full ${fixedAspect ? 'h-full object-cover' : 'h-auto'} group-hover:scale-105 transition-transform duration-500`}
         onLoad={handleLoad}

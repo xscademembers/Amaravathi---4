@@ -3,6 +3,11 @@ import Gallery from '../models/Gallery.js';
 import { authMiddleware } from './auth.js';
 import { isDbConnected } from '../db.js';
 import { fallbackGalleryDocuments } from '../galleryFallback.js';
+import {
+  downloadGalleryImage,
+  galleryDocumentForResponse,
+  parseImageDataUrl,
+} from '../../shared/galleryStorage.js';
 
 const router = Router();
 
@@ -61,13 +66,32 @@ router.get('/', async (req, res) => {
   }
 
   try {
-    const images = await Gallery.find().sort({ order: 1, createdAt: -1 });
+    const images = await Gallery.find().select('-imageData').sort({ order: 1, createdAt: -1 });
     if (images.length === 0) {
       return res.json(fallbackGalleryDocuments());
     }
-    res.json(images);
+    res.json(images.map(galleryDocumentForResponse));
   } catch (error) {
     res.json(fallbackGalleryDocuments());
+  }
+});
+
+router.get('/:id/image', async (req, res) => {
+  if (!isDbConnected()) {
+    return res.status(503).json({ error: 'Database unavailable' });
+  }
+
+  try {
+    const image = await Gallery.findById(req.params.id).select('imageData imageContentType');
+    if (!image?.imageData?.length) {
+      return res.status(404).json({ error: 'Stored image not found' });
+    }
+
+    res.setHeader('Content-Type', image.imageContentType || 'image/jpeg');
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    return res.send(image.imageData);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -77,14 +101,28 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 
   try {
-    const { imageUrl, title } = req.body;
-    if (!imageUrl) return res.status(400).json({ error: 'Image URL is required' });
+    const { imageData, imageUrl, title } = req.body;
+    if (!imageData && !imageUrl) {
+      return res.status(400).json({ error: 'Upload an image or enter an image URL' });
+    }
+
+    const imported = imageData
+      ? { ...parseImageDataUrl(imageData), sourceUrl: '' }
+      : await downloadGalleryImage(imageUrl.trim());
 
     const count = await Gallery.countDocuments();
-    const image = await Gallery.create({ imageUrl, title: title || '', order: count });
-    res.status(201).json(image);
+    const image = await Gallery.create({
+      imageUrl: '',
+      sourceUrl: imported.sourceUrl,
+      imageData: imported.buffer,
+      imageContentType: imported.contentType,
+      title: title || '',
+      order: count,
+    });
+    res.status(201).json(galleryDocumentForResponse(image));
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    const status = /image|URL|host|http|redirect/i.test(error.message) ? 422 : 500;
+    res.status(status).json({ error: error.message });
   }
 });
 

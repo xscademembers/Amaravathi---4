@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { resolveGalleryImageSrc } from '../lib/gallery';
+import { prepareGalleryUpload, resolveGalleryImageSrc } from '../lib/gallery';
 import {
   ImagePlus,
   Trash2,
@@ -25,6 +25,8 @@ const API = import.meta.env.VITE_API_URL || '';
 interface GalleryImage {
   _id: string;
   imageUrl: string;
+  sourceUrl?: string;
+  stored?: boolean;
   title: string;
   createdAt: string;
 }
@@ -61,14 +63,51 @@ function formatDate(dateStr: string) {
   });
 }
 
+function AdminGalleryImage({ image }: { image: GalleryImage }) {
+  const [broken, setBroken] = useState(false);
+
+  if (broken) {
+    return (
+      <div className="w-full h-40 bg-red-500/5 flex flex-col items-center justify-center text-center px-4">
+        <ImageIcon size={28} className="text-red-400/50 mb-2" />
+        <p className="text-red-300/80 text-xs font-medium">Saved link has expired</p>
+        <p className="text-white/30 text-[10px] mt-1">Delete it and upload the original file again</p>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={resolveGalleryImageSrc(image.imageUrl)}
+      alt={image.title || 'Gallery image'}
+      className="w-full h-40 object-cover"
+      onError={() => setBroken(true)}
+    />
+  );
+}
+
 // ─── Gallery Tab ──────────────────────────────────────────────────
 function GalleryManager() {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
+  const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState('');
   const [title, setTitle] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+
+  useEffect(() => {
+    if (!selectedFile) {
+      setPreviewUrl('');
+      return;
+    }
+    const objectUrl = URL.createObjectURL(selectedFile);
+    setPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [selectedFile]);
 
   const fetchImages = useCallback(async () => {
     setLoading(true);
@@ -88,22 +127,34 @@ function GalleryManager() {
 
   const handleAdd = async (e: FormEvent) => {
     e.preventDefault();
-    if (!imageUrl.trim()) return;
+    if (uploadMode === 'file' && !selectedFile) return;
+    if (uploadMode === 'url' && !imageUrl.trim()) return;
     setSubmitting(true);
+    setFormError('');
     try {
+      const imageData = selectedFile ? await prepareGalleryUpload(selectedFile) : undefined;
       const res = await fetch(`${API}/api/gallery`, {
         method: 'POST',
         headers: authHeaders(),
-        body: JSON.stringify({ imageUrl, title }),
+        body: JSON.stringify({
+          imageData: uploadMode === 'file' ? imageData : undefined,
+          imageUrl: uploadMode === 'url' ? imageUrl.trim() : undefined,
+          title,
+        }),
       });
-      if (res.ok) {
-        setImageUrl('');
-        setTitle('');
-        setShowForm(false);
-        fetchImages();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || 'Could not add this image');
       }
+
+      setImageUrl('');
+      setSelectedFile(null);
+      setTitle('');
+      setShowForm(false);
+      fetchImages();
     } catch (err) {
       console.error('Failed to add image:', err);
+      setFormError(err instanceof Error ? err.message : 'Could not add this image');
     } finally {
       setSubmitting(false);
     }
@@ -142,17 +193,55 @@ function GalleryManager() {
 
       {showForm && (
         <form onSubmit={handleAdd} className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8">
+          <div className="flex gap-2 mb-5">
+            <button
+              type="button"
+              onClick={() => { setUploadMode('file'); setFormError(''); }}
+              className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
+                uploadMode === 'file' ? 'gold-gradient text-maroon' : 'bg-white/5 text-white/50'
+              }`}
+            >
+              Upload File
+            </button>
+            <button
+              type="button"
+              onClick={() => { setUploadMode('url'); setFormError(''); }}
+              className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${
+                uploadMode === 'url' ? 'gold-gradient text-maroon' : 'bg-white/5 text-white/50'
+              }`}
+            >
+              Import URL
+            </button>
+          </div>
+
           <div className="grid sm:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 block mb-2">Image URL *</label>
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={e => setImageUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-lg text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-gold"
-                required
-              />
+              {uploadMode === 'file' ? (
+                <>
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 block mb-2">Image File *</label>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+                    onChange={e => setSelectedFile(e.target.files?.[0] || null)}
+                    className="block w-full text-sm text-white/50 file:mr-4 file:rounded-lg file:border-0 file:bg-white/10 file:px-4 file:py-3 file:text-xs file:font-bold file:uppercase file:tracking-wider file:text-white hover:file:bg-white/15"
+                    required
+                  />
+                  <p className="text-white/25 text-[11px] mt-2">Recommended. The image is stored with the site and will not expire.</p>
+                </>
+              ) : (
+                <>
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 block mb-2">Image URL *</label>
+                  <input
+                    type="url"
+                    value={imageUrl}
+                    onChange={e => setImageUrl(e.target.value)}
+                    placeholder="https://example.com/image.jpg"
+                    className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-lg text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-gold"
+                    required
+                  />
+                  <p className="text-white/25 text-[11px] mt-2">The server imports and stores a copy. Temporary Google Maps links may already be expired.</p>
+                </>
+              )}
             </div>
             <div>
               <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50 block mb-2">Title (optional)</label>
@@ -165,10 +254,20 @@ function GalleryManager() {
               />
             </div>
           </div>
-          {imageUrl && (
+          {(previewUrl || (uploadMode === 'url' && imageUrl)) && (
             <div className="mb-4 rounded-xl overflow-hidden border border-white/10 max-w-xs">
-              <img src={resolveGalleryImageSrc(imageUrl)} alt="Preview" className="w-full h-40 object-cover" onError={e => (e.currentTarget.style.display = 'none')} />
+              <img
+                src={previewUrl || resolveGalleryImageSrc(imageUrl)}
+                alt="Preview"
+                className="w-full h-40 object-cover"
+                onError={e => (e.currentTarget.style.display = 'none')}
+              />
             </div>
+          )}
+          {formError && (
+            <p className="mb-4 text-sm text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3">
+              {formError}
+            </p>
           )}
           <button
             type="submit"
@@ -195,7 +294,12 @@ function GalleryManager() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {images.map(img => (
             <div key={img._id} className="group relative rounded-xl overflow-hidden border border-white/10 bg-white/5">
-              <img src={resolveGalleryImageSrc(img.imageUrl)} alt={img.title} className="w-full h-40 object-cover" />
+              <AdminGalleryImage image={img} />
+              {img.stored && (
+                <span className="absolute top-2 left-2 rounded-full bg-green-500/80 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-white">
+                  Stored
+                </span>
+              )}
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                 <button
                   onClick={() => handleDelete(img._id)}
@@ -203,9 +307,11 @@ function GalleryManager() {
                 >
                   <Trash2 size={16} />
                 </button>
-                <a href={img.imageUrl} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-colors">
-                  <ExternalLink size={16} />
-                </a>
+                {(img.sourceUrl || !img.imageUrl.startsWith('/api/')) && (
+                  <a href={img.sourceUrl || img.imageUrl} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-colors">
+                    <ExternalLink size={16} />
+                  </a>
+                )}
               </div>
               {img.title && (
                 <div className="p-2 text-white/60 text-xs truncate">{img.title}</div>
