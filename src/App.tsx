@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import { 
@@ -35,6 +35,7 @@ import {
 import { motion } from 'motion/react';
 import { fetchGalleryImages } from './lib/gallery';
 import GalleryThumb from './components/GalleryThumb';
+import OptimizedImage from './components/OptimizedImage';
 import { trackLead } from './utils/metaPixel';
 
 // --- Types ---
@@ -143,7 +144,7 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
-  const [galleryLoading, setGalleryLoading] = useState(true);
+  const [galleryLoading, setGalleryLoading] = useState(false);
   const [mobileEventIndex, setMobileEventIndex] = useState(0);
   const [eventTouchStartX, setEventTouchStartX] = useState<number | null>(null);
   const [mobileGalleryIndex, setMobileGalleryIndex] = useState(0);
@@ -152,6 +153,8 @@ export default function App() {
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [formData, setFormData] = useState({ name: '', phone: '', eventType: 'Wedding', eventDate: '', message: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [galleryVisible, setGalleryVisible] = useState(false);
+  const gallerySectionRef = useRef<HTMLElement>(null);
   const mobileEventSlides = EVENT_TYPES;
   const mobileGalleryImages = galleryImages.slice(0, 10);
 
@@ -162,26 +165,45 @@ export default function App() {
     setGalleryLoading(false);
   }, []);
 
-  useEffect(() => { loadGallery(); }, [loadGallery]);
+  useEffect(() => {
+    const el = gallerySectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setGalleryVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!galleryVisible) return;
+    loadGallery();
+  }, [galleryVisible, loadGallery]);
   useEffect(() => {
     setMobileGalleryIndex((prev) => (mobileGalleryImages.length ? Math.min(prev, mobileGalleryImages.length - 1) : 0));
     setMobileGalleryProgressMs(0);
   }, [mobileGalleryImages.length]);
   useEffect(() => {
-    if (mobileGalleryImages.length <= 1 || isMobileGalleryPaused) return;
+    if (mobileGalleryImages.length <= 1 || isMobileGalleryPaused || !galleryVisible) return;
     const timer = window.setInterval(() => {
       setMobileGalleryProgressMs((prev) => Math.min(prev + MOBILE_GALLERY_TICK_MS, MOBILE_GALLERY_AUTOPLAY_MS));
     }, MOBILE_GALLERY_TICK_MS);
     return () => clearInterval(timer);
-  }, [mobileGalleryImages.length, isMobileGalleryPaused]);
+  }, [mobileGalleryImages.length, isMobileGalleryPaused, galleryVisible]);
 
   useEffect(() => {
-    if (mobileGalleryImages.length <= 1 || isMobileGalleryPaused) return;
+    if (mobileGalleryImages.length <= 1 || isMobileGalleryPaused || !galleryVisible) return;
     if (mobileGalleryProgressMs < MOBILE_GALLERY_AUTOPLAY_MS) return;
 
     setMobileGalleryIndex((prev) => (prev + 1) % mobileGalleryImages.length);
     setMobileGalleryProgressMs(0);
-  }, [mobileGalleryProgressMs, mobileGalleryImages.length, isMobileGalleryPaused]);
+  }, [mobileGalleryProgressMs, mobileGalleryImages.length, isMobileGalleryPaused, galleryVisible]);
 
   useEffect(() => {
     if (!location.hash) return;
@@ -208,7 +230,7 @@ export default function App() {
         body: JSON.stringify(formData),
       });
       if (res.ok) {
-        trackLead(formData.phone);
+        await trackLead(formData.phone);
         setFormStatus('success');
         setFormData({ name: '', phone: '', eventType: 'Wedding', eventDate: '', message: '' });
         setTimeout(() => setFormStatus('idle'), 4000);
@@ -261,11 +283,11 @@ export default function App() {
       {/* --- Hero Section --- */}
       <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-4 sm:pt-8">
         <div className="absolute inset-0 z-0">
-          <img 
+          <OptimizedImage 
             src="/DSC05370.jpg" 
             alt="Luxury Wedding Setup" 
             className="w-full h-full object-cover scale-105"
-            referrerPolicy="no-referrer"
+            priority
           />
           <div className="absolute inset-0 bg-black/50"></div>
         </div>
@@ -352,11 +374,11 @@ export default function App() {
               className="relative"
             >
               <div className="aspect-[4/5] w-[88%] sm:w-full mx-auto rounded-3xl overflow-hidden luxury-shadow">
-                <img 
+                <OptimizedImage 
                   src="/DSC05341.jpg" 
                   alt="Venue Interior" 
                   className="w-full h-full object-cover object-[center_73%]"
-                  referrerPolicy="no-referrer"
+                  lazy
                 />
               </div>
               <div className="absolute -bottom-8 -right-8 bg-maroon p-8 rounded-3xl text-white hidden sm:block luxury-shadow">
@@ -426,11 +448,11 @@ export default function App() {
             >
               {mobileEventSlides.length > 0 && (
                 <>
-                  <img
+                  <OptimizedImage
                     src={mobileEventSlides[mobileEventIndex].image}
                     alt={mobileEventSlides[mobileEventIndex].title}
                     className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
+                    priority
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-maroon via-maroon/20 to-transparent opacity-85"></div>
                   <div className="absolute bottom-0 left-0 p-6 text-white">
@@ -476,11 +498,11 @@ export default function App() {
                 transition={{ delay: i * 0.1 }}
                 className="group relative h-[400px] rounded-3xl overflow-hidden luxury-shadow cursor-pointer"
               >
-                <img 
+                <OptimizedImage 
                   src={event.image} 
                   alt={event.title} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  referrerPolicy="no-referrer"
+                  lazy
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-maroon via-maroon/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
                 <div className="absolute bottom-0 left-0 p-8 text-white">
@@ -544,7 +566,7 @@ export default function App() {
       </section>
 
       {/* --- Gallery Section --- */}
-      <section id="gallery" className="py-[30px] sm:py-16 bg-ivory">
+      <section id="gallery" ref={gallerySectionRef} className="py-[30px] sm:py-16 bg-ivory">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center md:text-left mb-16">
             <div className="text-center md:text-left">
@@ -553,12 +575,14 @@ export default function App() {
             </div>
           </div>
 
-          {galleryLoading && galleryImages.length === 0 && (
+          {galleryVisible && galleryLoading && galleryImages.length === 0 && (
             <div className="flex justify-center py-16">
               <div className="w-10 h-10 border-2 border-maroon/20 border-t-maroon rounded-full animate-spin" />
             </div>
           )}
 
+          {galleryVisible && (
+          <>
           <div className="md:hidden">
             <motion.div
               key={mobileGalleryImages[mobileGalleryIndex] ?? 'mobile-gallery-fallback'}
@@ -612,6 +636,8 @@ export default function App() {
               </motion.div>
             ))}
           </div>
+          </>
+          )}
           <div className="mt-10 flex justify-center">
             <button onClick={() => { window.scrollTo(0, 0); navigate('/gallery'); }} className="gold-gradient text-maroon px-8 md:px-12 py-3.5 md:py-4 rounded-full font-bold uppercase tracking-[0.14em] md:tracking-[0.2em] text-xs md:text-sm hover:opacity-90 transition-all luxury-shadow">
               The Full Collection
@@ -822,13 +848,14 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="sm:hidden mb-2">
             <div className="flex flex-col items-center text-center">
-              <img
-                src="/logo%20accepted.png"
+              <OptimizedImage
+                src="/logo accepted.png"
                 alt="Amaravathi Conventions"
                 className="w-44 object-contain"
+                lazy
                 onError={(e) => {
                   e.currentTarget.onerror = null;
-                  e.currentTarget.src = '/amaravathi%20Logo%201.svg';
+                  e.currentTarget.src = '/amaravathi Logo 1.svg';
                 }}
               />
               <p className="mt-4 text-white/40 text-sm leading-relaxed max-w-xs">
@@ -876,10 +903,11 @@ export default function App() {
               <div className="pt-0 sm:pt-2 lg:pt-3">
                 <div className="mb-0 flex w-full justify-center lg:justify-start">
                   <div className="flex h-fit w-40 shrink-0 items-start justify-center lg:justify-start sm:w-48 md:w-56">
-                    <img
-                      src="/logo%20accepted.png"
+                    <OptimizedImage
+                      src="/logo accepted.png"
                       alt="Amaravathi Conventions"
                       className="max-h-full w-full max-w-full object-contain object-center lg:object-left object-top"
+                      lazy
                     />
                   </div>
                 </div>

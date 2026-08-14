@@ -29,6 +29,12 @@
   box-shadow: 0 10px 30px -10px rgba(128, 0, 0, 0.1);
 }
 
+/* Skip rendering below-fold sections until near viewport */
+section:not(#home) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
 .gold-gradient {
   background: linear-gradient(135deg, #D4AF37 0%, #F9E29C 50%, #D4AF37 100%);
 }

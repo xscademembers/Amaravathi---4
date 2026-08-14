@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ImageOff } from 'lucide-react';
+import OptimizedImage from './OptimizedImage';
 
 type GalleryThumbProps = {
   src: string;
@@ -28,6 +29,7 @@ export default function GalleryThumb({
   const [loading, setLoading] = useState(true);
   const imgRef = useRef<HTMLImageElement>(null);
   const roundClass = rounded === '2xl' ? 'rounded-2xl' : 'rounded-3xl';
+  const eager = index < 2;
 
   useEffect(() => {
     setError(false);
@@ -47,7 +49,7 @@ export default function GalleryThumb({
       imgRef.current = el;
       markLoaded(el, setLoading);
     },
-    [src]
+    [src],
   );
 
   if (error) {
@@ -66,10 +68,12 @@ export default function GalleryThumb({
       className={`relative overflow-hidden group bg-maroon/5 ${roundClass} ${onClick ? 'cursor-pointer' : ''} ${fixedAspect ? 'aspect-[4/3]' : ''} ${loading && !fixedAspect ? 'min-h-[200px]' : ''} ${loading ? 'animate-pulse' : ''} luxury-shadow`}
       onClick={onClick}
     >
-      <img
+      <OptimizedImage
         ref={setImgRef}
         src={src}
         alt={alt}
+        priority={eager}
+        lazy={!eager}
         className={`w-full ${fixedAspect ? 'h-full object-cover' : 'h-auto'} group-hover:scale-105 transition-transform duration-500`}
         onLoad={handleLoad}
         onError={handleError}

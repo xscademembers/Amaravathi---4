@@ -3,6 +3,7 @@ import { ImageOff, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Navbar from '../components/Navbar';
 import GalleryThumb from '../components/GalleryThumb';
+import OptimizedImage from '../components/OptimizedImage';
 import { fetchGalleryImages } from '../lib/gallery';
 
 export default function GalleryPage() {
@@ -127,16 +128,20 @@ export default function GalleryPage() {
               &#8249;
             </button>
 
-            <motion.img
+            <motion.div
               key={lightbox}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              src={images[lightbox]}
-              alt={`Gallery ${lightbox + 1}`}
-              className="max-h-[85vh] max-w-[90vw] object-contain rounded-xl"
               onClick={e => e.stopPropagation()}
-            />
+            >
+              <OptimizedImage
+                src={images[lightbox]}
+                alt={`Gallery ${lightbox + 1}`}
+                className="max-h-[85vh] max-w-[90vw] object-contain rounded-xl"
+                priority
+              />
+            </motion.div>
 
             <button
               onClick={(e) => { e.stopPropagation(); setLightbox((lightbox + 1) % images.length); }}

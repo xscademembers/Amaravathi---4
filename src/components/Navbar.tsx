@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import OptimizedImage from './OptimizedImage';
 
 const NAV_ITEMS = [
   { label: 'Home', href: '#home' },
@@ -58,10 +59,11 @@ export default function Navbar({ transparent = true }: NavbarProps) {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center cursor-pointer gap-3" onClick={() => handleNav('#home')}>
-            <img
+            <OptimizedImage
               src="/1.png"
               alt="Amaravathi Conventions"
               className="h-20 w-52 object-contain"
+              priority
             />
           </div>
 
