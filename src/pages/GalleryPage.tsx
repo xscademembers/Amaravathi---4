@@ -158,7 +158,7 @@ export default function GalleryPage() {
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="mt-auto shrink-0 bg-[#1a1a1a] py-6 text-center">
+      <footer className="mt-auto shrink-0 bg-black py-6 text-center">
         <p className="text-white/30 text-[11px] uppercase tracking-[0.2em]">
           &copy; 2026 Amaravathi Conventions. All Rights Reserved.
         </p>

@@ -844,7 +844,7 @@ export default function App() {
       </section>
 
       {/* --- Footer --- */}
-      <footer className="h-fit bg-[#1a1a1a] text-white pt-6 pb-4 lg:pt-4 lg:pb-2.5">
+      <footer className="h-fit bg-black text-white pt-6 pb-4 lg:pt-4 lg:pb-2.5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="sm:hidden mb-2">
             <div className="flex flex-col items-center text-center">
